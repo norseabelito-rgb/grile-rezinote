@@ -31,6 +31,8 @@ export const subscriptionStatusEnum = pgEnum("subscription_status", [
 export const users = pgTable("users", {
   id: uuid("id").primaryKey(), // matches auth.users.id from Supabase
   email: text("email").notNull(),
+  fullName: text("full_name").notNull(),
+  yearOfStudy: integer("year_of_study"), // 1-6, nullable for admin users
   role: userRoleEnum("role").notNull().default("student"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 })

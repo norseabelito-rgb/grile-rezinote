@@ -34,11 +34,28 @@ export async function middleware(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser()
 
+  const pathname = request.nextUrl.pathname
+
+  // Public auth routes that unauthenticated users can access
+  const publicAuthRoutes = [
+    "/login",
+    "/signup",
+    "/forgot-password",
+    "/verify-email",
+    "/update-password",
+  ]
+
+  // Redirect authenticated users away from auth pages to dashboard
+  if (user && publicAuthRoutes.some((route) => pathname.startsWith(route))) {
+    const url = request.nextUrl.clone()
+    url.pathname = "/dashboard"
+    return NextResponse.redirect(url)
+  }
+
   // Redirect unauthenticated users from protected routes
   if (
     !user &&
-    (request.nextUrl.pathname.startsWith("/dashboard") ||
-      request.nextUrl.pathname.startsWith("/admin"))
+    (pathname.startsWith("/dashboard") || pathname.startsWith("/admin"))
   ) {
     const url = request.nextUrl.clone()
     url.pathname = "/login"

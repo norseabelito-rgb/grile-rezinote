@@ -46,7 +46,7 @@ function NavigatorGrid({
               key={q.id}
               onClick={() => onNavigate(q.id)}
               className={cn(
-                "flex h-10 w-full items-center justify-center rounded-md border text-sm font-medium transition-all",
+                "flex h-11 w-full min-h-[44px] items-center justify-center rounded-md border text-sm font-medium transition-all",
                 isAnswered &&
                   "border-green-500 bg-green-500/20 text-green-700 dark:text-green-300",
                 isFlagged &&

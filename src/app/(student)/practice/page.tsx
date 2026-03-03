@@ -55,7 +55,7 @@ export default async function PracticePage() {
                       {new Date(attempt.startedAt).toLocaleDateString("ro-RO")}
                     </p>
                   </div>
-                  <Button asChild size="sm">
+                  <Button asChild size="sm" className="min-h-[44px]">
                     <Link href={`/practice/${attempt.id}`}>Continua</Link>
                   </Button>
                 </CardContent>

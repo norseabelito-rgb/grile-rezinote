@@ -61,12 +61,14 @@ export function TrendChart({ data, height = 300 }: TrendChartProps) {
           tick={{ fill: "hsl(var(--muted-foreground))" }}
         />
         <Tooltip
-          formatter={(value: number, name: string) => {
-            if (name === "accuracyPct") return [`${value}%`, "Acuratete"]
-            if (name === "totalQuestions") return [value, "Intrebari"]
-            return [value, name]
+          formatter={(value?: number, name?: string) => {
+            const v = value ?? 0
+            const n = name ?? ""
+            if (n === "accuracyPct") return [`${v}%`, "Acuratete"]
+            if (n === "totalQuestions") return [v, "Intrebari"]
+            return [v, n]
           }}
-          labelFormatter={formatDate}
+          labelFormatter={(label) => formatDate(String(label))}
           contentStyle={{
             backgroundColor: "hsl(var(--card))",
             border: "1px solid hsl(var(--border))",

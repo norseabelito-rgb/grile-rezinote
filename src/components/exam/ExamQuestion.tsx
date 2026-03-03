@@ -38,9 +38,9 @@ export function ExamQuestion({
 }: ExamQuestionProps) {
   return (
     <Card>
-      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
+      <CardHeader className="flex flex-row flex-wrap items-center justify-between gap-2 space-y-0 pb-3">
         <div className="flex items-center gap-2">
-          <span className="text-lg font-bold">
+          <span className="text-base font-bold sm:text-lg">
             Intrebarea {questionNumber}/{totalQuestions}
           </span>
           <Badge

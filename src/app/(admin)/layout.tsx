@@ -17,7 +17,10 @@ export default async function AdminLayout({
   return (
     <div className="flex h-screen overflow-hidden">
       <AdminSidebar />
-      <main className="flex-1 overflow-y-auto">{children}</main>
+      <main className="flex-1 overflow-y-auto">
+        {/* Add top padding on mobile for the floating menu button */}
+        <div className="pt-14 md:pt-0">{children}</div>
+      </main>
     </div>
   )
 }

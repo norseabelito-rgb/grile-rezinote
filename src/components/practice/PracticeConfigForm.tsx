@@ -154,7 +154,7 @@ export function PracticeConfigForm({
               onValueChange={setFeedbackMode}
               className="space-y-3"
             >
-              <div className="flex items-start gap-3 rounded-lg border p-3">
+              <div className="flex min-h-[44px] items-start gap-3 rounded-lg border p-3">
                 <RadioGroupItem value="immediate" id="immediate" className="mt-1" />
                 <Label htmlFor="immediate" className="cursor-pointer">
                   <div className="font-medium">Feedback imediat</div>
@@ -163,7 +163,7 @@ export function PracticeConfigForm({
                   </p>
                 </Label>
               </div>
-              <div className="flex items-start gap-3 rounded-lg border p-3">
+              <div className="flex min-h-[44px] items-start gap-3 rounded-lg border p-3">
                 <RadioGroupItem value="deferred" id="deferred" className="mt-1" />
                 <Label htmlFor="deferred" className="cursor-pointer">
                   <div className="font-medium">Feedback la final</div>
@@ -189,7 +189,7 @@ export function PracticeConfigForm({
         <Button
           type="submit"
           size="lg"
-          className="w-full"
+          className="min-h-[44px] w-full"
           disabled={selectedChapterIds.length === 0 || isPending}
         >
           {isPending ? "Se creeaza testul..." : "Incepe testul"}

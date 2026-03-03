@@ -46,8 +46,8 @@ export function QuestionOptionGroup({
             <div
               key={opt.label}
               className={cn(
-                "flex items-center gap-3 rounded-lg border p-3 transition-colors",
-                !showResults && "hover:bg-accent",
+                "flex min-h-[44px] items-center gap-3 rounded-lg border p-3 transition-colors",
+                !showResults && "hover:bg-accent active:bg-accent",
                 showResults && isCorrect && "border-green-500 bg-green-50 dark:bg-green-950/30",
                 showResults && isWrong && "border-red-500 bg-red-50 dark:bg-red-950/30"
               )}
@@ -56,7 +56,7 @@ export function QuestionOptionGroup({
               <Label
                 htmlFor={`opt-${opt.label}`}
                 className={cn(
-                  "flex-1 cursor-pointer",
+                  "flex-1 cursor-pointer text-sm sm:text-base",
                   disabled && "cursor-default"
                 )}
               >
@@ -82,8 +82,8 @@ export function QuestionOptionGroup({
           <div
             key={opt.label}
             className={cn(
-              "flex items-center gap-3 rounded-lg border p-3 transition-colors",
-              !showResults && "hover:bg-accent",
+              "flex min-h-[44px] items-center gap-3 rounded-lg border p-3 transition-colors",
+              !showResults && "hover:bg-accent active:bg-accent",
               showResults && isCorrect && "border-green-500 bg-green-50 dark:bg-green-950/30",
               showResults && isWrong && "border-red-500 bg-red-50 dark:bg-red-950/30"
             )}
@@ -104,7 +104,7 @@ export function QuestionOptionGroup({
             <Label
               htmlFor={`opt-${opt.label}`}
               className={cn(
-                "flex-1 cursor-pointer",
+                "flex-1 cursor-pointer text-sm sm:text-base",
                 disabled && "cursor-default"
               )}
             >

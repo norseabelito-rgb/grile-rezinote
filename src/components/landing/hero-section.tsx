@@ -25,10 +25,10 @@ export function HeroSection() {
         </p>
 
         <div className="mt-10 flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
-          <Button size="lg" asChild className="min-w-[200px]">
+          <Button size="lg" asChild className="min-h-[44px] w-full min-w-[200px] sm:w-auto">
             <Link href="/signup">Incepe gratuit</Link>
           </Button>
-          <Button size="lg" variant="outline" asChild className="min-w-[200px]">
+          <Button size="lg" variant="outline" asChild className="min-h-[44px] w-full min-w-[200px] sm:w-auto">
             <Link href="#features">Afla mai multe</Link>
           </Button>
         </div>

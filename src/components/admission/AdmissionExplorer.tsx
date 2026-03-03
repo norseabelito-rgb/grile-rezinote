@@ -182,11 +182,11 @@ export function AdmissionExplorer({
           </div>
 
           {/* Year range */}
-          <div className="flex gap-4">
-            <div className="w-40">
+          <div className="grid grid-cols-2 gap-4 sm:flex">
+            <div className="sm:w-40">
               <Label className="mb-1 block text-sm">De la an</Label>
               <Select value={yearFrom} onValueChange={setYearFrom}>
-                <SelectTrigger>
+                <SelectTrigger className="min-h-[44px]">
                   <SelectValue placeholder="Toti anii" />
                 </SelectTrigger>
                 <SelectContent>
@@ -199,10 +199,10 @@ export function AdmissionExplorer({
                 </SelectContent>
               </Select>
             </div>
-            <div className="w-40">
+            <div className="sm:w-40">
               <Label className="mb-1 block text-sm">Pana la an</Label>
               <Select value={yearTo} onValueChange={setYearTo}>
-                <SelectTrigger>
+                <SelectTrigger className="min-h-[44px]">
                   <SelectValue placeholder="Toti anii" />
                 </SelectTrigger>
                 <SelectContent>
@@ -228,7 +228,7 @@ export function AdmissionExplorer({
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <ResponsiveContainer width="100%" height={400}>
+            <ResponsiveContainer width="100%" height={300}>
               <LineChart data={chartData}>
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis dataKey="year" />
@@ -260,8 +260,8 @@ export function AdmissionExplorer({
             <CardTitle className="text-base">Date detaliate</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="max-h-96 overflow-auto rounded-md border">
-              <Table>
+            <div className="max-h-96 overflow-x-auto overflow-y-auto rounded-md border">
+              <Table className="min-w-[500px]">
                 <TableHeader>
                   <TableRow>
                     <TableHead>Specialitate</TableHead>

@@ -59,7 +59,7 @@ export function ChapterRadar({ data }: ChapterRadarProps) {
           animationDuration={1000}
         />
         <Tooltip
-          formatter={(value: number) => [`${value}%`, "Acuratete"]}
+          formatter={(value?: number) => [`${value ?? 0}%`, "Acuratete"]}
           contentStyle={{
             backgroundColor: "hsl(var(--card))",
             border: "1px solid hsl(var(--border))",

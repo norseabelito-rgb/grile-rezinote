@@ -243,28 +243,29 @@ export function ExamContainer({
       {/* Main content */}
       <div className="flex-1 space-y-4 pb-20 md:pb-4">
         {/* Sticky top bar */}
-        <div className="sticky top-0 z-30 flex items-center justify-between border-b bg-background px-2 py-3">
+        <div className="sticky top-0 z-30 flex flex-wrap items-center justify-between gap-2 border-b bg-background px-2 py-2 sm:py-3">
           <ExamTimer deadline={deadline} onTimeUp={handleTimeUp} />
 
-          <span className="text-sm font-medium text-muted-foreground">
+          <span className="text-xs font-medium text-muted-foreground sm:text-sm">
             {currentIndex + 1}/{questions.length}
           </span>
 
           <div className="flex items-center gap-2">
             {isSaving && (
-              <span className="text-xs text-muted-foreground animate-pulse">
+              <span className="hidden text-xs text-muted-foreground animate-pulse sm:inline">
                 Salvare...
               </span>
             )}
             {!isSaving && lastSaved && (
-              <span className="text-xs text-muted-foreground">Salvat</span>
+              <span className="hidden text-xs text-muted-foreground sm:inline">Salvat</span>
             )}
             <Button
               size="sm"
               onClick={() => setShowSubmitModal(true)}
               disabled={isSubmitting}
+              className="min-h-[44px] text-xs sm:text-sm"
             >
-              Trimite examenul
+              Trimite
             </Button>
           </div>
         </div>
@@ -288,7 +289,7 @@ export function ExamContainer({
             variant="outline"
             onClick={goPrev}
             disabled={currentIndex === 0}
-            className="gap-2"
+            className="min-h-[44px] gap-2"
           >
             <ChevronLeft className="h-4 w-4" />
             Anterioara
@@ -298,7 +299,7 @@ export function ExamContainer({
             variant="outline"
             onClick={goNext}
             disabled={currentIndex === questions.length - 1}
-            className="gap-2"
+            className="min-h-[44px] gap-2"
           >
             Urmatoarea
             <ChevronRight className="h-4 w-4" />
@@ -306,8 +307,8 @@ export function ExamContainer({
         </div>
       </div>
 
-      {/* Navigator sidebar */}
-      <div className="w-48 shrink-0">
+      {/* Navigator - desktop shows sidebar, mobile shows bottom bar + sheet */}
+      <div className="w-0 shrink-0 md:w-48">
         <ExamNavigator
           questions={questions.map((q, i) => ({ id: q.id, number: i + 1 }))}
           answeredIds={answeredIds}

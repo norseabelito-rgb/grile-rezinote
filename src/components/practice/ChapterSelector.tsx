@@ -67,7 +67,7 @@ export function ChapterSelector({
         {chapters.map((chapter) => (
           <label
             key={chapter.id}
-            className="flex cursor-pointer items-center gap-3 rounded-lg border p-3 transition-colors hover:bg-accent"
+            className="flex min-h-[44px] cursor-pointer items-center gap-3 rounded-lg border p-3 transition-colors hover:bg-accent active:bg-accent"
           >
             <Checkbox
               checked={selectedIds.includes(chapter.id)}

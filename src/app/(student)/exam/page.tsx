@@ -26,7 +26,7 @@ export default async function ExamStartPage() {
         {/* In-progress exam banner */}
         {inProgressExam && (
           <Card className="border-blue-300 bg-blue-50 dark:border-blue-700 dark:bg-blue-950">
-            <CardContent className="flex items-center justify-between p-4">
+            <CardContent className="flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:justify-between">
               <div>
                 <p className="font-medium text-blue-800 dark:text-blue-200">
                   Ai o simulare in curs
@@ -35,7 +35,7 @@ export default async function ExamStartPage() {
                   {inProgressExam.questionCount} intrebari
                 </p>
               </div>
-              <Button asChild>
+              <Button asChild className="min-h-[44px] w-full sm:w-auto">
                 <Link href={`/exam/${inProgressExam.id}`}>
                   Continua simularea
                 </Link>
@@ -124,7 +124,7 @@ export default async function ExamStartPage() {
             "use server"
             await createExamAttempt()
           }}>
-            <Button size="lg" className="text-lg px-8 py-6">
+            <Button size="lg" className="min-h-[44px] w-full text-lg px-8 py-6 sm:w-auto">
               Incepe simularea
             </Button>
           </form>

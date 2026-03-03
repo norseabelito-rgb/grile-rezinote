@@ -14,6 +14,7 @@ const studentLinks = [
   { href: "/dashboard", label: "Dashboard" },
   { href: "/practice", label: "Teste Practice" },
   { href: "/practice/mistakes", label: "Greselile mele" },
+  { href: "/admission", label: "Admitere" },
   { href: "/subscription", label: "Abonament" },
 ]
 

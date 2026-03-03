@@ -1,6 +1,13 @@
 import { createServerClient } from "@supabase/ssr"
 import { NextResponse, type NextRequest } from "next/server"
 
+// Routes that bypass subscription check (user must be authed but not subscribed)
+const subscriptionBypassRoutes = [
+  "/pricing",
+  "/checkout",
+  "/subscription",
+]
+
 export async function middleware(request: NextRequest) {
   let supabaseResponse = NextResponse.next({
     request,
@@ -60,6 +67,54 @@ export async function middleware(request: NextRequest) {
     const url = request.nextUrl.clone()
     url.pathname = "/login"
     return NextResponse.redirect(url)
+  }
+
+  // Subscription gating for student routes (dashboard)
+  // Skip check for admin routes, subscription bypass routes, and API routes
+  if (
+    user &&
+    pathname.startsWith("/dashboard") &&
+    !subscriptionBypassRoutes.some((route) => pathname.startsWith(route))
+  ) {
+    // Query subscription status via Supabase client (Edge-compatible)
+    const { data: subscription } = await supabase
+      .from("subscriptions")
+      .select("status, current_period_end")
+      .eq("user_id", user.id)
+      .single()
+
+    const { data: userRecord } = await supabase
+      .from("users")
+      .select("trial_started_at")
+      .eq("id", user.id)
+      .single()
+
+    const hasActiveSubscription =
+      subscription?.status === "active" ||
+      (subscription?.status === "trialing" &&
+        subscription.current_period_end &&
+        new Date(subscription.current_period_end) > new Date())
+
+    // Check server-side trial
+    const trialStartedAt = userRecord?.trial_started_at
+      ? new Date(userRecord.trial_started_at)
+      : null
+
+    const trialActive =
+      trialStartedAt &&
+      new Date(trialStartedAt.getTime() + 7 * 24 * 60 * 60 * 1000) >
+        new Date()
+
+    // Trial not started yet — allow access (will start on this visit)
+    const trialNotStarted = !trialStartedAt
+
+    if (!hasActiveSubscription && !trialActive && !trialNotStarted) {
+      // Subscription expired — redirect to pricing with paywall flag
+      const url = request.nextUrl.clone()
+      url.pathname = "/pricing"
+      url.searchParams.set("paywall", "true")
+      return NextResponse.redirect(url)
+    }
   }
 
   return supabaseResponse

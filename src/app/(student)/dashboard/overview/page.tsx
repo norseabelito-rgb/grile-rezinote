@@ -9,6 +9,7 @@ import { TrendChart } from "@/components/dashboard/trend-chart"
 import { ChapterRadar } from "@/components/dashboard/radar-chart"
 import { TimeRangeSelector } from "@/components/dashboard/time-range-selector"
 import { DataTypeToggle } from "@/components/dashboard/data-type-toggle"
+import { MotivationCard } from "@/components/motivation/motivation-card"
 import {
   fetchDashboardOverview,
   fetchTrends,
@@ -106,6 +107,11 @@ export default async function OverviewPage({
               icon={Flame}
             />
           </div>
+
+          {/* Daily Motivation */}
+          <Suspense fallback={null}>
+            <MotivationCard />
+          </Suspense>
 
           {/* Trend Chart */}
           <Card>

@@ -1,7 +1,9 @@
+import { Suspense } from "react"
 import { redirect } from "next/navigation"
 import { getCurrentUser } from "@/lib/auth/get-user"
 import { getExamResults } from "@/lib/db/queries/exam"
 import { ExamResults } from "@/components/exam/ExamResults"
+import { PostTestMessage } from "@/components/motivation/post-test-message"
 
 export default async function ExamResultsPage({
   params,
@@ -17,8 +19,24 @@ export default async function ExamResultsPage({
     redirect("/exam")
   }
 
+  // Compute accuracy metrics for post-test motivation message
+  const testTotal = data.questions.length
+  let testCorrect = 0
+  for (const [, answer] of data.answers) {
+    if (answer.isCorrect) testCorrect++
+  }
+  const testAccuracy =
+    testTotal > 0 ? Math.round((testCorrect / testTotal) * 100) : 0
+
   return (
     <div className="mx-auto max-w-4xl px-4 py-6">
+      <Suspense fallback={null}>
+        <PostTestMessage
+          testAccuracy={testAccuracy}
+          testCorrect={testCorrect}
+          testTotal={testTotal}
+        />
+      </Suspense>
       <ExamResults
         attempt={{
           score: data.attempt.score,

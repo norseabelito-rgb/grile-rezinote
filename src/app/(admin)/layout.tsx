@@ -1,19 +1,26 @@
 import type { Metadata } from "next"
-import { AppShell } from "@/components/shared/app-shell"
+import { getCurrentAdmin } from "@/lib/db/queries/admin"
+import { AdminSidebar } from "@/components/admin/admin-sidebar"
 
 export const metadata: Metadata = {
   title: "Admin | grile-ReziNOTE",
 }
 
-const adminLinks = [
-  { href: "/admin", label: "Panou Admin" },
-  { href: "/dashboard", label: "Dashboard" },
-]
-
-export default function AdminLayout({
+export default async function AdminLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
-  return <AppShell links={adminLinks}>{children}</AppShell>
+  // Server-side superadmin check - redirects non-admins to /dashboard
+  await getCurrentAdmin()
+
+  return (
+    <div className="flex h-screen overflow-hidden">
+      <AdminSidebar />
+      <main className="flex-1 overflow-y-auto">
+        {/* Add top padding on mobile for the floating menu button */}
+        <div className="pt-14 md:pt-0">{children}</div>
+      </main>
+    </div>
+  )
 }

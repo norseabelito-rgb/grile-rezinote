@@ -15,6 +15,7 @@ const studentLinks = [
   { href: "/practice", label: "Teste Practice" },
   { href: "/exam", label: "Simulare" },
   { href: "/practice/mistakes", label: "Greselile mele" },
+  { href: "/admission", label: "Admitere" },
   { href: "/subscription", label: "Abonament" },
 ]
 

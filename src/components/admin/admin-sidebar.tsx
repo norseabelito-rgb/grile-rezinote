@@ -8,6 +8,8 @@ import {
   HelpCircle,
   FileSpreadsheet,
   Settings,
+  GraduationCap,
+  BarChart3,
   ArrowLeft,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
@@ -21,6 +23,12 @@ const navItems = [
     href: "/admin/import-export",
     label: "Import / Export",
     icon: FileSpreadsheet,
+  },
+  { href: "/admin/specialties", label: "Specialitati", icon: GraduationCap },
+  {
+    href: "/admin/admission-data",
+    label: "Date admitere",
+    icon: BarChart3,
   },
   { href: "/admin/settings", label: "Setari", icon: Settings },
 ]

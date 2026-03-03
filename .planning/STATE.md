@@ -3,12 +3,12 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: unknown
-last_updated: "2026-03-03T00:31:40.754Z"
+last_updated: "2026-03-03T01:22:52.886Z"
 progress:
   total_phases: 10
-  completed_phases: 4
-  total_plans: 14
-  completed_plans: 14
+  completed_phases: 5
+  total_plans: 27
+  completed_plans: 19
 ---
 
 # Project State
@@ -18,23 +18,23 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-02)
 
 **Core value:** Studentii pot simula examene reale de rezidentiat si vedea instant daca ar fi fost admisi si unde, pe baza datelor istorice reale.
-**Current focus:** Phase 3 - Admin Content Management (complete)
+**Current focus:** Phase 5 - Exam Simulation (complete)
 
 ## Current Position
 
-Phase: 3 of 10 (Admin Content Management)
+Phase: 5 of 10 (Exam Simulation)
 Plan: 4 of 4 in current phase
 Status: Phase complete
-Last activity: 2026-03-03 — Phase 3 completed
+Last activity: 2026-03-03 — Phase 5 completed
 
-Progress: [███░░░░░░░] 30%
+Progress: [█████░░░░░] 50%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 10
+- Total plans completed: 18
 - Average duration: ~12 min
-- Total execution time: ~120 min
+- Total execution time: ~210 min
 
 **By Phase:**
 
@@ -43,9 +43,11 @@ Progress: [███░░░░░░░] 30%
 | 1. Foundation & Design System | 3/3 | ~30 min | ~10 min |
 | 2. Landing Page & Authentication | 3/3 | ~35 min | ~12 min |
 | 3. Admin Content Management | 4/4 | ~55 min | ~14 min |
+| 4. Practice Tests | 4/4 | ~45 min | ~11 min |
+| 5. Exam Simulation | 4/4 | ~45 min | ~11 min |
 
 **Recent Trend:**
-- Last 4 plans: 03-01 (15min), 03-02 (12min), 03-03 (15min), 03-04 (12min)
+- Last 4 plans: 05-01 (12min), 05-02 (10min), 05-03 (13min), 05-04 (10min)
 - Trend: Consistent
 
 *Updated after each plan completion*
@@ -71,6 +73,12 @@ Recent decisions affecting current work:
 - [Phase 3]: @dnd-kit chosen for drag-and-drop reordering (maintained, modern, good a11y)
 - [Phase 3]: Client-side CSV/Excel parsing to avoid large file uploads to server
 - [Phase 3]: UTF-8 BOM prepended to CSV exports for Romanian diacritics in Excel
+- [Phase 5]: Seeded PRNG (mulberry32) for deterministic option shuffling — survives page refresh/resume
+- [Phase 5]: Batch auto-save every 30 seconds with dirty tracking via useRef (not per-answer)
+- [Phase 5]: Server-authoritative timer: deadline = startedAt + timeLimit computed on server, client timer is cosmetic
+- [Phase 5]: 60-second grace period after deadline for network latency; server rejects saves/submits past grace
+- [Phase 5]: One question per page display (unlike practice mode's scrollable list) — closer to real exam UX
+- [Phase 5]: siteSettings table for admin-configurable exam duration (key-value store pattern)
 
 ### Pending Todos
 
@@ -84,5 +92,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-03-03
-Stopped at: Phase 3 complete, ready for Phase 4 planning
+Stopped at: Phase 5 complete, ready for Phase 6 planning
 Resume file: None

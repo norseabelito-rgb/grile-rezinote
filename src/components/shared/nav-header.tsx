@@ -18,7 +18,6 @@ interface NavHeaderProps {
 }
 
 const defaultLinks: NavLink[] = [
-  { href: "/", label: "Acasa" },
   { href: "/dashboard", label: "Dashboard" },
 ]
 

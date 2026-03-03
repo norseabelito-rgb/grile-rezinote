@@ -207,6 +207,119 @@
   }
 }
 
+/* ─── Aurora blobs ─── */
+.aurora-blob {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  opacity: 0.5;
+  will-change: transform;
+}
+.dark .aurora-blob {
+  opacity: 0.3;
+}
+.aurora-blob-1 {
+  width: 600px;
+  height: 600px;
+  top: -200px;
+  left: -100px;
+  background: radial-gradient(circle, #818cf8 0%, #6366f1 40%, transparent 70%);
+  animation: aurora-float-1 14s ease-in-out infinite;
+}
+.aurora-blob-2 {
+  width: 500px;
+  height: 500px;
+  top: -100px;
+  right: -150px;
+  background: radial-gradient(circle, #c084fc 0%, #8b5cf6 40%, transparent 70%);
+  animation: aurora-float-2 18s ease-in-out infinite;
+}
+.aurora-blob-3 {
+  width: 400px;
+  height: 400px;
+  bottom: -100px;
+  left: 30%;
+  background: radial-gradient(circle, #f0abfc 0%, #a78bfa 40%, transparent 70%);
+  animation: aurora-float-3 16s ease-in-out infinite;
+}
+@keyframes aurora-float-1 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33% { transform: translate(80px, 40px) scale(1.1); }
+  66% { transform: translate(-40px, 20px) scale(0.95); }
+}
+@keyframes aurora-float-2 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33% { transform: translate(-60px, 30px) scale(0.9); }
+  66% { transform: translate(40px, -40px) scale(1.1); }
+}
+@keyframes aurora-float-3 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33% { transform: translate(50px, -30px) scale(1.15); }
+  66% { transform: translate(-30px, 50px) scale(0.9); }
+}
+
+/* ─── Shimmer border ─── */
+@keyframes shimmer-slide {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+.shimmer-border {
+  position: relative;
+  overflow: hidden;
+}
+.shimmer-border::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1.5px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(99, 102, 241, 0.4) 30%,
+    rgba(139, 92, 246, 0.6) 50%,
+    rgba(99, 102, 241, 0.4) 70%,
+    transparent 100%
+  );
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask-composite: exclude;
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  animation: shimmer-slide 3s ease-in-out infinite;
+}
+
+/* ─── Gradient text animation ─── */
+@keyframes gradient-shift {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+.gradient-text-animated {
+  background: linear-gradient(135deg, #6366f1, #8b5cf6, #c084fc, #818cf8, #6366f1);
+  background-size: 300% 300%;
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: gradient-shift 6s ease-in-out infinite;
+}
+
+/* ─── Pulse glow on buttons ─── */
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 20px rgba(99, 102, 241, 0.3), 0 0 60px rgba(99, 102, 241, 0.1); }
+  50% { box-shadow: 0 0 30px rgba(99, 102, 241, 0.5), 0 0 80px rgba(99, 102, 241, 0.2); }
+}
+.pulse-glow {
+  animation: pulse-glow 3s ease-in-out infinite;
+}
+
+/* ─── Floating animation ─── */
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+}
+.animate-float {
+  animation: float 4s ease-in-out infinite;
+}
+
 /* PWA safe area utilities for notched devices */
 .pb-safe {
   padding-bottom: env(safe-area-inset-bottom, 0px);

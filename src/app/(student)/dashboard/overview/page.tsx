@@ -10,6 +10,7 @@ import { ChapterRadar } from "@/components/dashboard/radar-chart"
 import { TimeRangeSelector } from "@/components/dashboard/time-range-selector"
 import { DataTypeToggle } from "@/components/dashboard/data-type-toggle"
 import { MotivationCard } from "@/components/motivation/motivation-card"
+import { AnimatedStatGrid, AnimatedStatItem, AnimatedSection } from "@/components/motion/dashboard-animations"
 import {
   fetchDashboardOverview,
   fetchTrends,
@@ -87,36 +88,46 @@ export default async function OverviewPage({
       ) : (
         <>
           {/* Stat Cards */}
-          <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
-            <StatCard
-              label="Acuratete"
-              value={`${overview.stats.accuracyPct}%`}
-              icon={<Target className="h-6 w-6 text-primary" />}
-            />
-            <StatCard
-              label="Intrebari"
-              value={overview.stats.totalQuestions}
-              icon={<FileQuestion className="h-6 w-6 text-primary" />}
-            />
-            <StatCard
-              label="Teste"
-              value={overview.stats.totalTests}
-              icon={<ClipboardCheck className="h-6 w-6 text-primary" />}
-            />
-            <StatCard
-              label="Serie"
-              value={`${overview.streak} zile`}
-              icon={<Flame className="h-6 w-6 text-accent-warm" />}
-            />
-          </div>
+          <AnimatedStatGrid className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+            <AnimatedStatItem>
+              <StatCard
+                label="Acuratete"
+                value={`${overview.stats.accuracyPct}%`}
+                icon={<Target className="h-6 w-6 text-primary" />}
+              />
+            </AnimatedStatItem>
+            <AnimatedStatItem>
+              <StatCard
+                label="Intrebari"
+                value={overview.stats.totalQuestions}
+                icon={<FileQuestion className="h-6 w-6 text-primary" />}
+              />
+            </AnimatedStatItem>
+            <AnimatedStatItem>
+              <StatCard
+                label="Teste"
+                value={overview.stats.totalTests}
+                icon={<ClipboardCheck className="h-6 w-6 text-primary" />}
+              />
+            </AnimatedStatItem>
+            <AnimatedStatItem>
+              <StatCard
+                label="Serie"
+                value={`${overview.streak} zile`}
+                icon={<Flame className="h-6 w-6 text-accent-warm" />}
+              />
+            </AnimatedStatItem>
+          </AnimatedStatGrid>
 
           {/* Daily Motivation */}
-          <Suspense fallback={null}>
-            <MotivationCard />
-          </Suspense>
+          <AnimatedSection delay={0.3}>
+            <Suspense fallback={null}>
+              <MotivationCard />
+            </Suspense>
+          </AnimatedSection>
 
           {/* Charts Grid */}
-          <div className="grid gap-6 lg:grid-cols-2">
+          <AnimatedSection delay={0.4} className="grid gap-6 lg:grid-cols-2">
             <Card className="border-border/50 shadow-sm">
               <CardHeader>
                 <CardTitle className="text-lg font-semibold">Evolutia Acuratetii</CardTitle>
@@ -134,7 +145,7 @@ export default async function OverviewPage({
                 <ChapterRadar data={chapterStats} />
               </CardContent>
             </Card>
-          </div>
+          </AnimatedSection>
         </>
       )}
     </div>

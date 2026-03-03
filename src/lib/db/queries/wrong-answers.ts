@@ -93,7 +93,7 @@ export async function getUnmasteredWrongAnswers(
     ORDER BY ast.last_answered_at DESC
   `)
 
-  return (result.rows as Array<Record<string, unknown>>).map((row) => ({
+  return (result as unknown as Array<Record<string, unknown>>).map((row) => ({
     questionId: row.question_id as string,
     questionText: row.question_text as string,
     questionType: row.question_type as "CS" | "CM",
@@ -144,7 +144,7 @@ export async function getWrongAnswerStats(
     FROM mastery_check mc
   `)
 
-  const statsRow = (result.rows as Array<Record<string, unknown>>)[0]
+  const statsRow = (result as unknown as Array<Record<string, unknown>>)[0]
 
   // Get per-chapter breakdown for unmastered
   const chapterResult = await db.execute(sql`
@@ -189,7 +189,7 @@ export async function getWrongAnswerStats(
   return {
     totalUnmastered: Number(statsRow?.total_unmastered ?? 0),
     totalMastered: Number(statsRow?.total_mastered ?? 0),
-    byChapter: (chapterResult.rows as Array<Record<string, unknown>>).map(
+    byChapter: (chapterResult as unknown as Array<Record<string, unknown>>).map(
       (row) => ({
         chapterId: row.chapter_id as string,
         chapterName: row.chapter_name as string,

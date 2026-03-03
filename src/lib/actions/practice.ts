@@ -145,7 +145,7 @@ export async function createPracticeAttempt(formData: FormData) {
     `
 
     const wrongResults = await db.execute(wrongAnswerQuery)
-    questionPool = (wrongResults.rows as Array<{ question_id: string }>).map(
+    questionPool = (wrongResults as unknown as Array<{ question_id: string }>).map(
       (r) => r.question_id
     )
   } else {

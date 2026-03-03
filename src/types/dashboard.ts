@@ -64,6 +64,27 @@ export interface AnswerHistoryResult {
   pageSize: number
 }
 
+export interface TestHistoryRow {
+  attemptId: string
+  type: string
+  score: number | null
+  maxScore: number | null
+  accuracyPct: number
+  questionCount: number
+  correctCount: number
+  startedAt: string
+  completedAt: string
+  chapterNames: string[]
+  feedbackMode: string | null
+}
+
+export interface TestHistoryResult {
+  rows: TestHistoryRow[]
+  total: number
+  page: number
+  pageSize: number
+}
+
 export interface DashboardOverview {
   stats: OverallStats
   streak: number

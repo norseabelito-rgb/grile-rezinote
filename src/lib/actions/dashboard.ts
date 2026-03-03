@@ -8,6 +8,7 @@ import {
   getHeatmapData,
   getStreakCount,
   getAnswerHistory,
+  getTestHistory,
   getChaptersForFilter,
 } from "@/lib/db/queries/dashboard"
 import type {
@@ -16,6 +17,7 @@ import type {
   DailyTrend,
   HeatmapCell,
   AnswerHistoryResult,
+  TestHistoryResult,
   DateRange,
   AttemptTypeFilter,
 } from "@/types/dashboard"
@@ -131,6 +133,24 @@ export async function fetchAnswerHistory(
     chapterId: chapterId || undefined,
     correct: correctBool,
     dateRange,
+    typeFilter: filter,
+  })
+}
+
+/**
+ * Fetch paginated test history.
+ */
+export async function fetchTestHistory(
+  page: number = 1,
+  pageSize: number = 20,
+  typeFilter?: string
+): Promise<TestHistoryResult> {
+  const user = await getCurrentUser()
+  const filter = parseTypeFilter(typeFilter)
+
+  return getTestHistory(user.id, {
+    page: Math.max(1, page),
+    pageSize: Math.max(1, Math.min(100, pageSize)),
     typeFilter: filter,
   })
 }

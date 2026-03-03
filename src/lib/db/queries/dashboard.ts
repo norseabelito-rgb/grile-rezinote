@@ -352,6 +352,100 @@ export async function getAnswerHistory(
 }
 
 /**
+ * Get paginated test (attempt) history.
+ */
+export async function getTestHistory(
+  userId: string,
+  opts: {
+    page: number
+    pageSize: number
+    typeFilter?: AttemptTypeFilter
+  }
+): Promise<{ rows: import("@/types/dashboard").TestHistoryRow[]; total: number; page: number; pageSize: number }> {
+  const conditions = [
+    sql`a.user_id = ${userId}`,
+    sql`a.status = 'completed'`,
+  ]
+
+  if (opts.typeFilter && opts.typeFilter !== "all") {
+    if (
+      opts.typeFilter === "practice_chapter" ||
+      opts.typeFilter === "practice_mixed"
+    ) {
+      conditions.push(
+        sql`a.type IN ('practice_chapter', 'practice_mixed')`
+      )
+    } else {
+      conditions.push(sql`a.type = ${opts.typeFilter}`)
+    }
+  }
+
+  const whereClause = sql.join(conditions, sql` AND `)
+  const offset = (opts.page - 1) * opts.pageSize
+
+  const rowsResult = await db.execute(sql`
+    SELECT
+      a.id as attempt_id,
+      a.type,
+      a.score,
+      a.max_score,
+      a.started_at,
+      a.completed_at,
+      a.question_count,
+      a.feedback_mode,
+      COALESCE(
+        ARRAY(
+          SELECT c.name FROM chapters c
+          WHERE c.id = ANY(a.chapter_ids::uuid[])
+          ORDER BY c.name
+        ),
+        ARRAY[]::text[]
+      ) as chapter_names,
+      COUNT(aa.id)::int as answer_count,
+      COUNT(*) FILTER (WHERE aa.is_correct = true)::int as correct_count,
+      ROUND(
+        COUNT(*) FILTER (WHERE aa.is_correct = true)::numeric /
+        NULLIF(COUNT(aa.id), 0) * 100, 1
+      )::float as accuracy_pct
+    FROM attempts a
+    LEFT JOIN attempt_answers aa ON aa.attempt_id = a.id
+    WHERE ${whereClause}
+    GROUP BY a.id
+    ORDER BY a.completed_at DESC
+    LIMIT ${opts.pageSize}
+    OFFSET ${offset}
+  `)
+
+  const countResult = await db.execute(sql`
+    SELECT COUNT(*)::int as total
+    FROM attempts a
+    WHERE ${whereClause}
+  `)
+
+  const total = Number(
+    (countResult as unknown as Array<Record<string, unknown>>)[0]?.total ?? 0
+  )
+
+  const rows = (
+    rowsResult as unknown as Array<Record<string, unknown>>
+  ).map((row) => ({
+    attemptId: String(row.attempt_id),
+    type: String(row.type),
+    score: row.score != null ? Number(row.score) : null,
+    maxScore: row.max_score != null ? Number(row.max_score) : null,
+    accuracyPct: Number(row.accuracy_pct ?? 0),
+    questionCount: Number(row.answer_count),
+    correctCount: Number(row.correct_count),
+    startedAt: new Date(row.started_at as string).toISOString(),
+    completedAt: new Date(row.completed_at as string).toISOString(),
+    chapterNames: (row.chapter_names as string[]) ?? [],
+    feedbackMode: row.feedback_mode as string | null,
+  }))
+
+  return { rows, total, page: opts.page, pageSize: opts.pageSize }
+}
+
+/**
  * Get non-archived chapters for filter dropdowns.
  */
 export async function getChaptersForFilter(): Promise<

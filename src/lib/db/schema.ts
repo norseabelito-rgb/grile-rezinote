@@ -84,6 +84,11 @@ export const attempts = pgTable("attempts", {
   startedAt: timestamp("started_at").defaultNow().notNull(),
   completedAt: timestamp("completed_at"),
   timeLimit: integer("time_limit"), // seconds, null for practice
+  feedbackMode: text("feedback_mode").default("deferred"), // 'immediate' | 'deferred'
+  chapterIds: text("chapter_ids").array(), // which chapters were selected
+  questionCount: integer("question_count"), // how many questions requested
+  questionOrder: text("question_order").array(), // ordered question IDs snapshot at creation
+  status: text("status").default("in_progress"), // 'in_progress' | 'completed' | 'abandoned'
 })
 
 export const attemptAnswers = pgTable("attempt_answers", {

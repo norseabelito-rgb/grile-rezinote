@@ -89,8 +89,8 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### PWA & Mobile
 
-- [ ] **PWA-01**: Platforma e instalabila ca PWA din browser (home screen icon, splash screen)
-- [ ] **PWA-02**: Interfata e complet responsive si functionala pe mobil
+- [x] **PWA-01**: Platforma e instalabila ca PWA din browser (home screen icon, splash screen)
+- [x] **PWA-02**: Interfata e complet responsive si functionala pe mobil
 - [ ] **PWA-03**: App shell-ul se cacheaza pentru incarcare rapida
 
 ### Limba & Localizare
@@ -189,8 +189,8 @@ Which phases cover which requirements. Updated during roadmap creation.
 | PAY-03 | Phase 9 | Pending |
 | PAY-04 | Phase 9 | Pending |
 | PAY-05 | Phase 9 | Pending |
-| PWA-01 | Phase 10 | Pending |
-| PWA-02 | Phase 10 | Pending |
+| PWA-01 | Phase 10 | Complete |
+| PWA-02 | Phase 10 | Complete |
 | PWA-03 | Phase 1 | Pending |
 | LANG-01 | Phase 1 | Pending |
 

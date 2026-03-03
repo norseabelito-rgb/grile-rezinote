@@ -50,6 +50,7 @@ export interface AnswerHistoryRow {
   chapterId: string
   selectedOptions: string[]
   correctOptions: string[]
+  allOptions: { label: string; text: string }[]
   isCorrect: boolean | null
   score: number | null
   answeredAt: string // ISO string for serialization

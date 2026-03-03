@@ -302,7 +302,12 @@ export async function getAnswerHistory(
         SELECT o.label FROM options o
         WHERE o.question_id = q.id AND o.is_correct = true
         ORDER BY o.label
-      ) as correct_options
+      ) as correct_options,
+      (
+        SELECT json_agg(json_build_object('label', o.label, 'text', o.text) ORDER BY o.label)
+        FROM options o
+        WHERE o.question_id = q.id
+      ) as all_options
     FROM attempt_answers aa
     JOIN attempts a ON aa.attempt_id = a.id
     JOIN questions q ON aa.question_id = q.id
@@ -336,6 +341,7 @@ export async function getAnswerHistory(
     chapterId: String(row.chapter_id),
     selectedOptions: (row.selected_options as string[]) ?? [],
     correctOptions: (row.correct_options as string[]) ?? [],
+    allOptions: (row.all_options as { label: string; text: string }[]) ?? [],
     isCorrect: row.is_correct as boolean | null,
     score: row.score as number | null,
     answeredAt: new Date(row.answered_at as string).toISOString(),

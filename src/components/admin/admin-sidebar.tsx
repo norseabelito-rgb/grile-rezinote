@@ -7,6 +7,7 @@ import {
   BookOpen,
   HelpCircle,
   FileSpreadsheet,
+  Settings,
   ArrowLeft,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
@@ -21,6 +22,7 @@ const navItems = [
     label: "Import / Export",
     icon: FileSpreadsheet,
   },
+  { href: "/admin/settings", label: "Setari", icon: Settings },
 ]
 
 export function AdminSidebar() {

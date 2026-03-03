@@ -1,5 +1,6 @@
 import { getCurrentUser } from "@/lib/auth/get-user"
 import { getChaptersForPractice, getInProgressAttempts } from "@/lib/db/queries/practice"
+import { getWrongAnswerStats } from "@/lib/db/queries/wrong-answers"
 import { PracticeConfigForm } from "@/components/practice/PracticeConfigForm"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -9,9 +10,10 @@ import { Button } from "@/components/ui/button"
 export default async function PracticePage() {
   const user = await getCurrentUser()
 
-  const [chapters, inProgressAttempts] = await Promise.all([
+  const [chapters, inProgressAttempts, wrongStats] = await Promise.all([
     getChaptersForPractice(),
     getInProgressAttempts(user.id),
+    getWrongAnswerStats(user.id),
   ])
 
   return (
@@ -64,7 +66,10 @@ export default async function PracticePage() {
       )}
 
       {/* New test configuration */}
-      <PracticeConfigForm chapters={chapters} />
+      <PracticeConfigForm
+        chapters={chapters}
+        wrongAnswerCount={wrongStats.totalUnmastered}
+      />
     </div>
   )
 }

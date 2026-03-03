@@ -13,6 +13,7 @@ const studentLinks = [
   { href: "/", label: "Acasa" },
   { href: "/dashboard", label: "Dashboard" },
   { href: "/practice", label: "Teste Practice" },
+  { href: "/practice/mistakes", label: "Greselile mele" },
   { href: "/subscription", label: "Abonament" },
 ]
 

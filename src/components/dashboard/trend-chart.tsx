@@ -47,18 +47,18 @@ export function TrendChart({ data, height = 300 }: TrendChartProps) {
             <stop offset="95%" stopColor="#10b981" stopOpacity={0} />
           </linearGradient>
         </defs>
-        <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
+        <CartesianGrid strokeDasharray="3 3" stroke="currentColor" opacity={0.1} />
         <XAxis
           dataKey="date"
           tickFormatter={formatDate}
           className="text-xs"
-          tick={{ fill: "#94a3b8" }}
+          tick={{ fill: "currentColor", opacity: 0.5 }}
         />
         <YAxis
           domain={[0, 100]}
           tickFormatter={(v) => `${v}%`}
           className="text-xs"
-          tick={{ fill: "#94a3b8" }}
+          tick={{ fill: "currentColor", opacity: 0.5 }}
         />
         <Tooltip
           formatter={(value?: number, name?: string) => {
@@ -70,10 +70,10 @@ export function TrendChart({ data, height = 300 }: TrendChartProps) {
           }}
           labelFormatter={(label) => formatDate(String(label))}
           contentStyle={{
-            backgroundColor: "#1a2e2a",
-            border: "1px solid rgba(255,255,255,0.1)",
+            backgroundColor: "var(--tooltip-bg, #1a2e2a)",
+            border: "1px solid var(--tooltip-border, rgba(255,255,255,0.1))",
             borderRadius: "8px",
-            color: "#e2e8f0",
+            color: "var(--tooltip-fg, #e2e8f0)",
           }}
         />
         <Area

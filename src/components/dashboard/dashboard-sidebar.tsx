@@ -36,11 +36,11 @@ function NavLinks({ onNavigate }: { onNavigate?: () => void }) {
             className={cn(
               "flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm transition-all duration-200",
               isActive
-                ? "bg-emerald-500/10 text-emerald-400 font-semibold shadow-sm border border-emerald-500/20"
-                : "text-muted-foreground hover:bg-white/[0.04] hover:text-foreground"
+                ? "bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 font-semibold shadow-sm border border-emerald-500/20"
+                : "text-muted-foreground hover:bg-black/[0.04] dark:hover:bg-white/[0.04] hover:text-foreground"
             )}
           >
-            <item.icon className={cn("h-4 w-4", isActive && "text-emerald-400")} />
+            <item.icon className={cn("h-4 w-4", isActive && "text-emerald-700 dark:text-emerald-400")} />
             {item.label}
           </Link>
         )

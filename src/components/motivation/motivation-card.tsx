@@ -73,27 +73,27 @@ const typeLabels: Record<MessageType, string> = {
 
 const typeStyles: Record<MessageType, string> = {
   encouragement:
-    "border-emerald-500/20 bg-emerald-950/40 text-emerald-100",
+    "border-emerald-600/15 bg-emerald-50 text-emerald-900 dark:border-emerald-500/20 dark:bg-emerald-950/40 dark:text-emerald-100",
   guidance:
-    "border-amber-500/20 bg-amber-950/40 text-amber-100",
+    "border-amber-600/15 bg-amber-50 text-amber-900 dark:border-amber-500/20 dark:bg-amber-950/40 dark:text-amber-100",
   didYouKnow:
-    "border-teal-500/20 bg-teal-950/40 text-teal-100",
+    "border-teal-600/15 bg-teal-50 text-teal-900 dark:border-teal-500/20 dark:bg-teal-950/40 dark:text-teal-100",
   milestone:
-    "border-violet-500/20 bg-violet-950/40 text-violet-100",
+    "border-violet-600/15 bg-violet-50 text-violet-900 dark:border-violet-500/20 dark:bg-violet-950/40 dark:text-violet-100",
 }
 
 const typeLabelStyles: Record<MessageType, string> = {
-  encouragement: "bg-emerald-500/20 text-emerald-300",
-  guidance: "bg-amber-500/20 text-amber-300",
-  didYouKnow: "bg-teal-500/20 text-teal-300",
-  milestone: "bg-violet-500/20 text-violet-300",
+  encouragement: "bg-emerald-100 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-300",
+  guidance: "bg-amber-100 text-amber-700 dark:bg-amber-500/20 dark:text-amber-300",
+  didYouKnow: "bg-teal-100 text-teal-700 dark:bg-teal-500/20 dark:text-teal-300",
+  milestone: "bg-violet-100 text-violet-700 dark:bg-violet-500/20 dark:text-violet-300",
 }
 
 const typeIconStyles: Record<MessageType, string> = {
-  encouragement: "bg-emerald-500/20 text-emerald-400",
-  guidance: "bg-amber-500/20 text-amber-400",
-  didYouKnow: "bg-teal-500/20 text-teal-400",
-  milestone: "bg-violet-500/20 text-violet-400",
+  encouragement: "bg-emerald-100 text-emerald-600 dark:bg-emerald-500/20 dark:text-emerald-400",
+  guidance: "bg-amber-100 text-amber-600 dark:bg-amber-500/20 dark:text-amber-400",
+  didYouKnow: "bg-teal-100 text-teal-600 dark:bg-teal-500/20 dark:text-teal-400",
+  milestone: "bg-violet-100 text-violet-600 dark:bg-violet-500/20 dark:text-violet-400",
 }
 
 /**

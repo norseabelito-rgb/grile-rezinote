@@ -35,7 +35,7 @@ export function AppShell({
       </main>
 
       <footer
-        className={`border-t border-white/[0.06] ${
+        className={`border-t border-border ${
           showMobileTabBar ? "hidden md:block" : ""
         }`}
       >

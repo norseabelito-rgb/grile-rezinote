@@ -39,16 +39,16 @@ export function ChapterRadar({ data }: ChapterRadarProps) {
   return (
     <ResponsiveContainer width="100%" height={400}>
       <RechartsRadarChart data={chartData}>
-        <PolarGrid className="stroke-muted" />
+        <PolarGrid stroke="currentColor" opacity={0.15} />
         <PolarAngleAxis
           dataKey="chapter"
           className="text-xs"
-          tick={{ fill: "#94a3b8", fontSize: 11 }}
+          tick={{ fill: "currentColor", opacity: 0.5, fontSize: 11 }}
         />
         <PolarRadiusAxis
           angle={30}
           domain={[0, 100]}
-          tick={{ fill: "#94a3b8", fontSize: 10 }}
+          tick={{ fill: "currentColor", opacity: 0.5, fontSize: 10 }}
         />
         <Radar
           name="Acuratete"
@@ -61,10 +61,10 @@ export function ChapterRadar({ data }: ChapterRadarProps) {
         <Tooltip
           formatter={(value?: number) => [`${value ?? 0}%`, "Acuratete"]}
           contentStyle={{
-            backgroundColor: "#1a2e2a",
-            border: "1px solid rgba(255,255,255,0.1)",
+            backgroundColor: "var(--tooltip-bg, #1a2e2a)",
+            border: "1px solid var(--tooltip-border, rgba(255,255,255,0.1))",
             borderRadius: "8px",
-            color: "#e2e8f0",
+            color: "var(--tooltip-fg, #e2e8f0)",
           }}
         />
       </RechartsRadarChart>

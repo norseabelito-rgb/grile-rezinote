@@ -20,7 +20,7 @@ export function StatCard({
 }: StatCardProps) {
   return (
     <Card className={cn(
-      "group relative overflow-hidden border-white/[0.06] transition-all duration-300 hover:shadow-lg hover:shadow-emerald-500/5 hover:-translate-y-0.5 animate-in fade-in",
+      "group relative overflow-hidden border-border transition-all duration-300 hover:shadow-lg hover:shadow-emerald-500/5 hover:-translate-y-0.5 animate-in fade-in",
       className
     )}>
       <div className="absolute inset-0 gradient-card opacity-0 group-hover:opacity-100 transition-opacity duration-300" />

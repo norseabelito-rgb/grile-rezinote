@@ -52,13 +52,13 @@ export function TrendChart({ data, height = 300 }: TrendChartProps) {
           dataKey="date"
           tickFormatter={formatDate}
           className="text-xs"
-          tick={{ fill: "hsl(var(--muted-foreground))" }}
+          tick={{ fill: "#94a3b8" }}
         />
         <YAxis
           domain={[0, 100]}
           tickFormatter={(v) => `${v}%`}
           className="text-xs"
-          tick={{ fill: "hsl(var(--muted-foreground))" }}
+          tick={{ fill: "#94a3b8" }}
         />
         <Tooltip
           formatter={(value?: number, name?: string) => {
@@ -70,9 +70,10 @@ export function TrendChart({ data, height = 300 }: TrendChartProps) {
           }}
           labelFormatter={(label) => formatDate(String(label))}
           contentStyle={{
-            backgroundColor: "hsl(var(--card))",
-            border: "1px solid hsl(var(--border))",
+            backgroundColor: "#1a2e2a",
+            border: "1px solid rgba(255,255,255,0.1)",
             borderRadius: "8px",
+            color: "#e2e8f0",
           }}
         />
         <Area

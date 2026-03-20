@@ -43,27 +43,28 @@ export function ChapterRadar({ data }: ChapterRadarProps) {
         <PolarAngleAxis
           dataKey="chapter"
           className="text-xs"
-          tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 11 }}
+          tick={{ fill: "#94a3b8", fontSize: 11 }}
         />
         <PolarRadiusAxis
           angle={30}
           domain={[0, 100]}
-          tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 10 }}
+          tick={{ fill: "#94a3b8", fontSize: 10 }}
         />
         <Radar
           name="Acuratete"
           dataKey="accuracy"
-          stroke="hsl(var(--primary))"
-          fill="hsl(var(--primary))"
+          stroke="#10b981"
+          fill="#10b981"
           fillOpacity={0.3}
           animationDuration={1000}
         />
         <Tooltip
           formatter={(value?: number) => [`${value ?? 0}%`, "Acuratete"]}
           contentStyle={{
-            backgroundColor: "hsl(var(--card))",
-            border: "1px solid hsl(var(--border))",
+            backgroundColor: "#1a2e2a",
+            border: "1px solid rgba(255,255,255,0.1)",
             borderRadius: "8px",
+            color: "#e2e8f0",
           }}
         />
       </RechartsRadarChart>

@@ -71,15 +71,29 @@ const typeLabels: Record<MessageType, string> = {
   milestone: "Reper",
 }
 
-const typeGradients: Record<MessageType, string> = {
+const typeStyles: Record<MessageType, string> = {
   encouragement:
-    "bg-gradient-to-r from-emerald-50 to-transparent dark:from-emerald-950/20 dark:to-transparent border-emerald-200/50 dark:border-emerald-800/30",
+    "border-emerald-500/20 bg-emerald-950/40 text-emerald-100",
   guidance:
-    "bg-gradient-to-r from-amber-50 to-transparent dark:from-amber-950/20 dark:to-transparent border-amber-200/50 dark:border-amber-800/30",
+    "border-amber-500/20 bg-amber-950/40 text-amber-100",
   didYouKnow:
-    "bg-gradient-to-r from-primary-50 to-transparent dark:from-primary-950/20 dark:to-transparent border-primary-200/50 dark:border-primary-800/30",
+    "border-teal-500/20 bg-teal-950/40 text-teal-100",
   milestone:
-    "bg-gradient-to-r from-violet-50 to-transparent dark:from-violet-950/20 dark:to-transparent border-violet-200/50 dark:border-violet-800/30",
+    "border-violet-500/20 bg-violet-950/40 text-violet-100",
+}
+
+const typeLabelStyles: Record<MessageType, string> = {
+  encouragement: "bg-emerald-500/20 text-emerald-300",
+  guidance: "bg-amber-500/20 text-amber-300",
+  didYouKnow: "bg-teal-500/20 text-teal-300",
+  milestone: "bg-violet-500/20 text-violet-300",
+}
+
+const typeIconStyles: Record<MessageType, string> = {
+  encouragement: "bg-emerald-500/20 text-emerald-400",
+  guidance: "bg-amber-500/20 text-amber-400",
+  didYouKnow: "bg-teal-500/20 text-teal-400",
+  milestone: "bg-violet-500/20 text-violet-400",
 }
 
 /**
@@ -94,15 +108,15 @@ export async function MotivationCard() {
   const Icon = iconMap[message.icon] ?? Sparkles
 
   return (
-    <Card className={`overflow-hidden ${typeGradients[message.type]}`}>
+    <Card className={`overflow-hidden ${typeStyles[message.type]}`}>
       <CardContent className="flex items-center gap-4 py-4">
-        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-background/80">
-          <Icon className="h-5 w-5 text-foreground" />
+        <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full ${typeIconStyles[message.type]}`}>
+          <Icon className="h-5 w-5" />
         </div>
         <div className="min-w-0 flex-1">
           <p className="text-sm leading-relaxed">{message.text}</p>
         </div>
-        <span className="shrink-0 rounded-full bg-background/60 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide text-muted-foreground">
+        <span className={`shrink-0 rounded-full px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wide ${typeLabelStyles[message.type]}`}>
           {typeLabels[message.type]}
         </span>
       </CardContent>

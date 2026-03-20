@@ -1,13 +1,19 @@
 "use server"
 
 import { redirect } from "next/navigation"
-import { createClient } from "@/lib/supabase/server"
+import { signIn, signOut } from "@/lib/auth"
+import { db } from "@/lib/db"
+import { users, passwordResetTokens } from "@/lib/db/schema"
+import { eq } from "drizzle-orm"
+import bcrypt from "bcryptjs"
+import crypto from "crypto"
 import {
   signupSchema,
   loginSchema,
   forgotPasswordSchema,
   updatePasswordSchema,
 } from "@/lib/validations/auth"
+import { auth } from "@/lib/auth"
 
 export type AuthState = {
   error?: string
@@ -30,24 +36,41 @@ export async function signup(
     return { errors: result.error.flatten().fieldErrors as Record<string, string[]> }
   }
 
-  const supabase = await createClient()
-  const { error } = await supabase.auth.signUp({
-    email: result.data.email,
-    password: result.data.password,
-    options: {
-      emailRedirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/auth/confirm`,
-      data: {
-        full_name: result.data.name,
-        year_of_study: result.data.yearOfStudy,
-      },
-    },
-  })
+  // Check if email already exists
+  const [existing] = await db
+    .select({ id: users.id })
+    .from(users)
+    .where(eq(users.email, result.data.email))
+    .limit(1)
 
-  if (error) {
-    return { error: error.message }
+  if (existing) {
+    return { error: "Exista deja un cont cu aceasta adresa de email" }
   }
 
-  redirect("/verify-email")
+  // Hash password
+  const passwordHash = await bcrypt.hash(result.data.password, 12)
+
+  // Create user
+  await db.insert(users).values({
+    email: result.data.email,
+    passwordHash,
+    fullName: result.data.name,
+    yearOfStudy: result.data.yearOfStudy,
+  })
+
+  // Auto-login after signup
+  try {
+    await signIn("credentials", {
+      email: result.data.email,
+      password: result.data.password,
+      redirect: false,
+    })
+  } catch {
+    // If auto-login fails, redirect to login
+    redirect("/login")
+  }
+
+  redirect("/dashboard")
 }
 
 export async function login(
@@ -63,13 +86,13 @@ export async function login(
     return { errors: result.error.flatten().fieldErrors as Record<string, string[]> }
   }
 
-  const supabase = await createClient()
-  const { error } = await supabase.auth.signInWithPassword({
-    email: result.data.email,
-    password: result.data.password,
-  })
-
-  if (error) {
+  try {
+    await signIn("credentials", {
+      email: result.data.email,
+      password: result.data.password,
+      redirect: false,
+    })
+  } catch {
     return { error: "Email sau parola incorecta" }
   }
 
@@ -77,8 +100,7 @@ export async function login(
 }
 
 export async function logout(): Promise<never> {
-  const supabase = await createClient()
-  await supabase.auth.signOut()
+  await signOut({ redirect: false })
   redirect("/login")
 }
 
@@ -94,10 +116,30 @@ export async function forgotPassword(
     return { errors: result.error.flatten().fieldErrors as Record<string, string[]> }
   }
 
-  const supabase = await createClient()
-  await supabase.auth.resetPasswordForEmail(result.data.email, {
-    redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/auth/confirm`,
-  })
+  // Find user
+  const [user] = await db
+    .select({ id: users.id })
+    .from(users)
+    .where(eq(users.email, result.data.email))
+    .limit(1)
+
+  if (user) {
+    // Generate reset token
+    const token = crypto.randomBytes(32).toString("hex")
+    const expiresAt = new Date(Date.now() + 60 * 60 * 1000) // 1 hour
+
+    await db.insert(passwordResetTokens).values({
+      userId: user.id,
+      token,
+      expiresAt,
+    })
+
+    // TODO: Send email with reset link
+    // For now, log the token (in production, use a proper email service)
+    console.log(
+      `Password reset link: ${process.env.NEXT_PUBLIC_SITE_URL}/update-password?token=${token}`
+    )
+  }
 
   // Always return success to not reveal if email exists
   return { success: true }
@@ -116,14 +158,45 @@ export async function updatePassword(
     return { errors: result.error.flatten().fieldErrors as Record<string, string[]> }
   }
 
-  const supabase = await createClient()
-  const { error } = await supabase.auth.updateUser({
-    password: result.data.password,
-  })
+  // Check for reset token or authenticated session
+  const token = formData.get("token") as string | null
 
-  if (error) {
-    return { error: error.message }
+  let userId: string | null = null
+
+  if (token) {
+    // Token-based reset
+    const [resetToken] = await db
+      .select()
+      .from(passwordResetTokens)
+      .where(eq(passwordResetTokens.token, token))
+      .limit(1)
+
+    if (!resetToken || resetToken.usedAt || resetToken.expiresAt < new Date()) {
+      return { error: "Link-ul de resetare a expirat sau a fost deja folosit" }
+    }
+
+    userId = resetToken.userId
+
+    // Mark token as used
+    await db
+      .update(passwordResetTokens)
+      .set({ usedAt: new Date() })
+      .where(eq(passwordResetTokens.id, resetToken.id))
+  } else {
+    // Session-based password update
+    const session = await auth()
+    if (!session?.user?.id) {
+      return { error: "Nu esti autentificat" }
+    }
+    userId = session.user.id
   }
+
+  // Hash and update password
+  const passwordHash = await bcrypt.hash(result.data.password, 12)
+  await db
+    .update(users)
+    .set({ passwordHash })
+    .where(eq(users.id, userId))
 
   redirect("/dashboard")
 }

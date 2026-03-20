@@ -29,14 +29,36 @@ export const subscriptionStatusEnum = pgEnum("subscription_status", [
 // Tables
 
 export const users = pgTable("users", {
-  id: uuid("id").primaryKey(), // matches auth.users.id from Supabase
-  email: text("email").notNull(),
+  id: uuid("id").defaultRandom().primaryKey(),
+  email: text("email").notNull().unique(),
+  passwordHash: text("password_hash").notNull(),
   fullName: text("full_name").notNull(),
   yearOfStudy: integer("year_of_study"), // 1-6, nullable for admin users
   role: userRoleEnum("role").notNull().default("student"),
   isSuperadmin: boolean("is_superadmin").notNull().default(false),
   peerOptIn: boolean("peer_opt_in").notNull().default(false), // opt-in for anonymous peer rankings
   trialStartedAt: timestamp("trial_started_at"), // set on first paid feature access
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+})
+
+export const sessions = pgTable("sessions", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  userId: uuid("user_id")
+    .references(() => users.id, { onDelete: "cascade" })
+    .notNull(),
+  token: text("token").notNull().unique(),
+  expiresAt: timestamp("expires_at").notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+})
+
+export const passwordResetTokens = pgTable("password_reset_tokens", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  userId: uuid("user_id")
+    .references(() => users.id, { onDelete: "cascade" })
+    .notNull(),
+  token: text("token").notNull().unique(),
+  expiresAt: timestamp("expires_at").notNull(),
+  usedAt: timestamp("used_at"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 })
 

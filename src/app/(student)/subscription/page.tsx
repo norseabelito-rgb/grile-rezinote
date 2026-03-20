@@ -1,23 +1,20 @@
 import { redirect } from "next/navigation"
 import Link from "next/link"
-import { createClient } from "@/lib/supabase/server"
+import { auth } from "@/lib/auth"
 import { getSubscriptionDetails } from "@/lib/stripe/actions"
 import { checkSubscriptionAccess } from "@/lib/subscription/check"
 import { SubscriptionStatus } from "@/components/subscription/SubscriptionStatus"
 import { ManageSubscription } from "@/components/subscription/ManageSubscription"
 
 export default async function SubscriptionPage() {
-  const supabase = await createClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
+  const session = await auth()
 
-  if (!user) {
+  if (!session?.user?.id) {
     redirect("/login")
   }
 
-  const details = await getSubscriptionDetails(user.id)
-  const access = await checkSubscriptionAccess(user.id)
+  const details = await getSubscriptionDetails(session.user.id)
+  const access = await checkSubscriptionAccess(session.user.id)
 
   // No subscription record at all — go to pricing
   if (!details) {

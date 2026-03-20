@@ -3,7 +3,7 @@
 import { redirect } from "next/navigation"
 import { stripe } from "./client"
 import { STRIPE_CONFIG } from "./config"
-import { createClient } from "@/lib/supabase/server"
+import { auth } from "@/lib/auth"
 import { db } from "@/lib/db"
 import { subscriptions } from "@/lib/db/schema"
 import { eq } from "drizzle-orm"
@@ -57,27 +57,24 @@ export async function getOrCreateCustomer(
  * Redirects the user to Stripe Hosted Checkout.
  */
 export async function createCheckoutSession(priceId: string) {
-  const supabase = await createClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
+  const session = await auth()
 
-  if (!user) {
+  if (!session?.user?.id || !session?.user?.email) {
     redirect("/login")
   }
 
-  const customerId = await getOrCreateCustomer(user.id, user.email!)
+  const customerId = await getOrCreateCustomer(session.user.id, session.user.email)
 
-  const session = await stripe.checkout.sessions.create({
+  const checkoutSession = await stripe.checkout.sessions.create({
     customer: customerId,
     mode: "subscription",
     line_items: [{ price: priceId, quantity: 1 }],
     success_url: `${STRIPE_CONFIG.successUrl}?session_id={CHECKOUT_SESSION_ID}`,
     cancel_url: STRIPE_CONFIG.cancelUrl,
-    metadata: { userId: user.id },
+    metadata: { userId: session.user.id },
   })
 
-  redirect(session.url!)
+  redirect(checkoutSession.url!)
 }
 
 /**
@@ -115,19 +112,16 @@ export async function getCheckoutSession(sessionId: string) {
  * Cancels the user's subscription at the end of the current billing period.
  */
 export async function cancelSubscription() {
-  const supabase = await createClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
+  const session = await auth()
 
-  if (!user) {
+  if (!session?.user?.id) {
     throw new Error("Nu esti autentificat")
   }
 
   const [sub] = await db
     .select()
     .from(subscriptions)
-    .where(eq(subscriptions.userId, user.id))
+    .where(eq(subscriptions.userId, session.user.id))
     .limit(1)
 
   if (!sub?.stripeSubscriptionId) {
@@ -141,7 +135,7 @@ export async function cancelSubscription() {
   await db
     .update(subscriptions)
     .set({ cancelAtPeriodEnd: true })
-    .where(eq(subscriptions.userId, user.id))
+    .where(eq(subscriptions.userId, session.user.id))
 
   return {
     success: true,
@@ -153,19 +147,16 @@ export async function cancelSubscription() {
  * Reactivates a subscription that was set to cancel at period end.
  */
 export async function reactivateSubscription() {
-  const supabase = await createClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
+  const session = await auth()
 
-  if (!user) {
+  if (!session?.user?.id) {
     throw new Error("Nu esti autentificat")
   }
 
   const [sub] = await db
     .select()
     .from(subscriptions)
-    .where(eq(subscriptions.userId, user.id))
+    .where(eq(subscriptions.userId, session.user.id))
     .limit(1)
 
   if (!sub?.stripeSubscriptionId) {
@@ -179,7 +170,7 @@ export async function reactivateSubscription() {
   await db
     .update(subscriptions)
     .set({ cancelAtPeriodEnd: false })
-    .where(eq(subscriptions.userId, user.id))
+    .where(eq(subscriptions.userId, session.user.id))
 
   return { success: true }
 }
@@ -188,19 +179,16 @@ export async function reactivateSubscription() {
  * Switches the billing cycle between monthly and annual.
  */
 export async function switchBillingCycle(newPriceId: string) {
-  const supabase = await createClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
+  const session = await auth()
 
-  if (!user) {
+  if (!session?.user?.id) {
     throw new Error("Nu esti autentificat")
   }
 
   const [sub] = await db
     .select()
     .from(subscriptions)
-    .where(eq(subscriptions.userId, user.id))
+    .where(eq(subscriptions.userId, session.user.id))
     .limit(1)
 
   if (!sub?.stripeSubscriptionId) {

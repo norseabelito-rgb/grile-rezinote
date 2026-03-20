@@ -2,7 +2,7 @@ import { redirect } from "next/navigation"
 import { eq } from "drizzle-orm"
 import { db } from "@/lib/db"
 import { users, auditLogs } from "@/lib/db/schema"
-import { createClient } from "@/lib/supabase/server"
+import { auth } from "@/lib/auth"
 
 /**
  * Verify that the given user ID belongs to a superadmin.
@@ -29,20 +29,17 @@ export async function requireSuperadmin(userId: string) {
 
 /**
  * Get the current authenticated admin user.
- * Creates Supabase client, gets auth user, verifies superadmin status.
+ * Gets session, verifies superadmin status.
  * Redirects if not authenticated or not superadmin.
  */
 export async function getCurrentAdmin() {
-  const supabase = await createClient()
-  const {
-    data: { user: authUser },
-  } = await supabase.auth.getUser()
+  const session = await auth()
 
-  if (!authUser) {
+  if (!session?.user?.id) {
     redirect("/login")
   }
 
-  return requireSuperadmin(authUser.id)
+  return requireSuperadmin(session.user.id)
 }
 
 /**

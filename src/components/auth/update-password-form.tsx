@@ -23,7 +23,7 @@ function SubmitButton() {
   )
 }
 
-export function UpdatePasswordForm() {
+export function UpdatePasswordForm({ token }: { token?: string }) {
   const [state, formAction] = useActionState<AuthState, FormData>(
     updatePassword,
     null
@@ -40,6 +40,9 @@ export function UpdatePasswordForm() {
 
       <CardContent>
         <form action={formAction} className="space-y-4">
+          {/* Pass reset token as hidden field */}
+          {token && <input type="hidden" name="token" value={token} />}
+
           {state?.error && (
             <div className="rounded-md bg-destructive/10 px-4 py-3 text-sm text-destructive">
               {state.error}

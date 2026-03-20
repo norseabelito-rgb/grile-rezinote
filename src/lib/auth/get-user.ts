@@ -5,18 +5,19 @@ import { redirect } from "next/navigation"
 import { db } from "@/lib/db"
 import { users } from "@/lib/db/schema"
 import { eq } from "drizzle-orm"
-import { createClient } from "@/lib/supabase/server"
+import { auth } from "@/lib/auth"
 
 /**
- * Get the Supabase auth user (cached per request).
- * Avoids multiple `supabase.auth.getUser()` network calls in the same render.
+ * Get the NextAuth session user (cached per request).
+ * Returns { id, email, name } or null.
  */
 export const getAuthUser = cache(async () => {
-  const supabase = await createClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
-  return user
+  const session = await auth()
+  if (!session?.user) return null
+  return {
+    id: session.user.id!,
+    email: session.user.email!,
+  }
 })
 
 /**

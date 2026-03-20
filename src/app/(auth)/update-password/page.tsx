@@ -5,6 +5,11 @@ export const metadata: Metadata = {
   title: "Parola noua — grile-ReziNOTE",
 }
 
-export default function UpdatePasswordPage() {
-  return <UpdatePasswordForm />
+export default async function UpdatePasswordPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ token?: string }>
+}) {
+  const { token } = await searchParams
+  return <UpdatePasswordForm token={token} />
 }

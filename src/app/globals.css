@@ -29,6 +29,7 @@
 
   /* Typography */
   --font-sans: 'Inter', ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --font-display: 'Sora', var(--font-sans);
 
   /* Border Radius — more rounded for friendlier feel */
   --radius-sm: 0.5rem;
@@ -323,4 +324,31 @@
 /* PWA safe area utilities for notched devices */
 .pb-safe {
   padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+/* ─── Anti-copy / Anti-screenshot ─── */
+@media print {
+  [data-protected] {
+    display: none !important;
+  }
+  body::after {
+    content: 'Printarea nu este permisa.';
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: fixed;
+    inset: 0;
+    font-size: 2rem;
+    font-weight: 700;
+    color: #ef4444;
+    background: white;
+    z-index: 99999;
+  }
+}
+
+[data-protected] {
+  -webkit-user-select: none !important;
+  user-select: none !important;
+  -webkit-touch-callout: none !important;
+  pointer-events: auto;
 }

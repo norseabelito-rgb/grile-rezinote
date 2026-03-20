@@ -1,13 +1,12 @@
 "use client"
 
-import { useState, useRef, useCallback, useTransition } from "react"
+import { useState, useCallback, useTransition } from "react"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
-import { Progress } from "@/components/ui/progress"
 import { QuestionCard } from "./QuestionCard"
-import { QuestionNavigator } from "./QuestionNavigator"
 import { ImmediateFeedbackModal } from "./ImmediateFeedbackModal"
 import { submitAnswer, completePracticeAttempt } from "@/lib/actions/practice"
+import { ChevronRight, CheckCircle } from "lucide-react"
 
 interface QuestionOption {
   label: string
@@ -55,6 +54,17 @@ export function QuizContainer({
   const router = useRouter()
   const [isPending, startTransition] = useTransition()
 
+  // Determine starting index: resume from the first unanswered question
+  const getStartIndex = () => {
+    for (let i = 0; i < questions.length; i++) {
+      const ans = initialAnswers.get(questions[i].id)
+      if (!ans || ans.isCorrect === null) return i
+    }
+    return questions.length - 1
+  }
+
+  const [currentIndex, setCurrentIndex] = useState(getStartIndex)
+
   // Answer state
   const [answers, setAnswers] = useState<Map<string, string[]>>(() => {
     const map = new Map<string, string[]>()
@@ -66,7 +76,7 @@ export function QuizContainer({
   const [answeredIds, setAnsweredIds] = useState<Set<string>>(() => {
     return new Set(
       Array.from(initialAnswers.entries())
-        .filter(([_, ans]) => ans.isCorrect !== null)
+        .filter(([, ans]) => ans.isCorrect !== null)
         .map(([qId]) => qId)
     )
   })
@@ -80,24 +90,16 @@ export function QuizContainer({
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isCompleting, setIsCompleting] = useState(false)
 
-  // Refs for scrolling
-  const questionRefs = useRef<Map<string, HTMLDivElement>>(new Map())
+  const currentQuestion = questions[currentIndex]
+  const isLastQuestion = currentIndex === questions.length - 1
+  const currentIsAnswered = currentQuestion ? answeredIds.has(currentQuestion.id) : false
 
-  const scrollToQuestion = useCallback((questionId: string) => {
-    const el = questionRefs.current.get(questionId)
-    if (el) {
-      el.scrollIntoView({ behavior: "smooth", block: "center" })
+  // Forward-only navigation
+  const goNext = useCallback(() => {
+    if (currentIndex < questions.length - 1) {
+      setCurrentIndex((prev) => prev + 1)
     }
-  }, [])
-
-  const scrollToNextUnanswered = useCallback(() => {
-    const nextUnanswered = questions.find(
-      (q) => !answeredIds.has(q.id)
-    )
-    if (nextUnanswered) {
-      scrollToQuestion(nextUnanswered.id)
-    }
-  }, [questions, answeredIds, scrollToQuestion])
+  }, [currentIndex, questions.length])
 
   // Submit answer to server and process feedback
   async function submitAndProcess(questionId: string, selectedOptions: string[]) {
@@ -115,7 +117,6 @@ export function QuizContainer({
         return
       }
 
-      // Mark as answered
       setAnsweredIds((prev) => {
         const next = new Set(prev)
         next.add(questionId)
@@ -132,14 +133,12 @@ export function QuizContainer({
         questionType: result.questionType as "CS" | "CM",
       }
 
-      // Store feedback
       setFeedbackData((prev) => {
         const next = new Map(prev)
         next.set(questionId, feedback)
         return next
       })
 
-      // Show immediate feedback modal
       if (feedbackMode === "immediate") {
         const questionNumber = questions.findIndex((q) => q.id === questionId) + 1
         setCurrentFeedback({ ...feedback, questionNumber })
@@ -150,17 +149,14 @@ export function QuizContainer({
   }
 
   async function handleAnswer(questionId: string, selectedOptions: string[]) {
-    // Update local state immediately
     setAnswers((prev) => {
       const next = new Map(prev)
       next.set(questionId, selectedOptions)
       return next
     })
 
-    // Don't submit if no options selected
     if (selectedOptions.length === 0) return
 
-    // For CM questions with immediate feedback, wait for explicit "Verify" click
     const question = questions.find((q) => q.id === questionId)
     if (feedbackMode === "immediate" && question?.type === "CM") {
       return
@@ -169,7 +165,6 @@ export function QuizContainer({
     await submitAndProcess(questionId, selectedOptions)
   }
 
-  // Called when user clicks "Verifica raspunsul" on a CM question
   async function handleVerify(questionId: string) {
     const selectedOptions = answers.get(questionId)
     if (!selectedOptions || selectedOptions.length === 0) return
@@ -190,7 +185,10 @@ export function QuizContainer({
 
   function handleFeedbackClose() {
     setCurrentFeedback(null)
-    scrollToNextUnanswered()
+    // Auto-advance to next question after closing feedback
+    if (!isLastQuestion) {
+      goNext()
+    }
   }
 
   async function handleComplete() {
@@ -202,15 +200,9 @@ export function QuizContainer({
         return
       }
 
-      if (feedbackMode === "deferred") {
-        startTransition(() => {
-          router.push(`/practice/${attemptId}/results`)
-        })
-      } else {
-        startTransition(() => {
-          router.push(`/practice/${attemptId}/results`)
-        })
-      }
+      startTransition(() => {
+        router.push(`/practice/${attemptId}/results`)
+      })
     } finally {
       setIsCompleting(false)
     }
@@ -222,86 +214,100 @@ export function QuizContainer({
       : 0
 
   return (
-    <div className="flex gap-6">
-      {/* Main content */}
-      <div className="flex-1 space-y-4 pb-20 md:pb-4">
-        {/* Top bar */}
-        <div className="sticky top-0 z-30 space-y-2 border-b bg-background pb-3 pt-1">
-          <div className="flex items-center justify-between">
-            <span className="text-sm font-medium">
-              {answeredIds.size}/{questions.length} intrebari raspunse
-            </span>
-            <Button
-              onClick={handleComplete}
-              disabled={isCompleting || isPending}
-              variant={answeredIds.size === questions.length ? "default" : "outline"}
-            >
-              {isCompleting || isPending ? "Se finalizeaza..." : "Termina testul"}
-            </Button>
-          </div>
-          <Progress value={progressPercent} className="h-2" />
+    <div className="mx-auto max-w-3xl space-y-4">
+      {/* Top bar */}
+      <div className="sticky top-0 z-30 space-y-2 rounded-b-xl border-b bg-background/95 px-4 pb-3 pt-2 backdrop-blur-sm">
+        <div className="flex items-center justify-between">
+          <span className="text-sm font-semibold tabular-nums">
+            {answeredIds.size}/{questions.length} intrebari raspunse
+          </span>
+          <span className="text-sm font-semibold tabular-nums text-muted-foreground">
+            {currentIndex + 1} / {questions.length}
+          </span>
+          <Button
+            onClick={handleComplete}
+            disabled={isCompleting || isPending}
+            variant={answeredIds.size === questions.length ? "default" : "outline"}
+            size="sm"
+            className="min-h-[44px]"
+          >
+            {isCompleting || isPending ? "Se finalizeaza..." : "Termina testul"}
+          </Button>
         </div>
-
-        {/* Questions */}
-        <div className="space-y-4">
-          {questions.map((question, index) => {
-            const questionFeedback = feedbackData.get(question.id)
-            const showFeedback =
-              feedbackMode === "immediate" && questionFeedback !== undefined
-
-            return (
-              <QuestionCard
-                key={question.id}
-                ref={(el) => {
-                  if (el) questionRefs.current.set(question.id, el)
-                }}
-                question={{
-                  id: question.id,
-                  text: question.text,
-                  type: question.type,
-                  options: question.options.map((o) => ({
-                    label: o.label,
-                    text: o.text,
-                  })),
-                }}
-                questionNumber={index + 1}
-                selected={answers.get(question.id) ?? []}
-                onAnswer={handleAnswer}
-                onVerify={
-                  feedbackMode === "immediate" && question.type === "CM"
-                    ? handleVerify
-                    : undefined
-                }
-                onFlag={handleFlag}
-                isFlagged={flaggedIds.has(question.id)}
-                isAnswered={answeredIds.has(question.id)}
-                disabled={isSubmitting}
-                isVerifying={isSubmitting}
-                feedback={
-                  showFeedback && questionFeedback
-                    ? {
-                        isCorrect: questionFeedback.isCorrect,
-                        correctOptions: questionFeedback.correctOptions,
-                        sourceBook: questionFeedback.sourceBook ?? question.sourceBook,
-                        sourcePage: questionFeedback.sourcePage ?? question.sourcePage,
-                      }
-                    : undefined
-                }
-                showResults={showFeedback}
-              />
-            )
-          })}
+        <div className="h-1.5 w-full overflow-hidden rounded-full bg-muted">
+          <div
+            className="h-full rounded-full bg-primary transition-all duration-500 ease-out"
+            style={{ width: `${progressPercent}%` }}
+          />
         </div>
       </div>
 
-      {/* Navigator */}
-      <div className="w-48 shrink-0">
-        <QuestionNavigator
-          questions={questions.map((q, i) => ({ id: q.id, number: i + 1 }))}
-          answeredIds={answeredIds}
-          flaggedIds={flaggedIds}
-          onNavigate={scrollToQuestion}
-        />
+      {/* Current question only */}
+      {currentQuestion && (
+        <div className="px-2 sm:px-0">
+          <QuestionCard
+            question={{
+              id: currentQuestion.id,
+              text: currentQuestion.text,
+              type: currentQuestion.type,
+              options: currentQuestion.options.map((o) => ({
+                label: o.label,
+                text: o.text,
+              })),
+            }}
+            questionNumber={currentIndex + 1}
+            selected={answers.get(currentQuestion.id) ?? []}
+            onAnswer={handleAnswer}
+            onVerify={
+              feedbackMode === "immediate" && currentQuestion.type === "CM"
+                ? handleVerify
+                : undefined
+            }
+            onFlag={handleFlag}
+            isFlagged={flaggedIds.has(currentQuestion.id)}
+            isAnswered={answeredIds.has(currentQuestion.id)}
+            disabled={isSubmitting}
+            isVerifying={isSubmitting}
+            feedback={
+              feedbackMode === "immediate" && feedbackData.has(currentQuestion.id)
+                ? {
+                    isCorrect: feedbackData.get(currentQuestion.id)!.isCorrect,
+                    correctOptions: feedbackData.get(currentQuestion.id)!.correctOptions,
+                    sourceBook:
+                      feedbackData.get(currentQuestion.id)!.sourceBook ??
+                      currentQuestion.sourceBook,
+                    sourcePage:
+                      feedbackData.get(currentQuestion.id)!.sourcePage ??
+                      currentQuestion.sourcePage,
+                  }
+                : undefined
+            }
+            showResults={feedbackMode === "immediate" && feedbackData.has(currentQuestion.id)}
+          />
+        </div>
+      )}
+
+      {/* Forward-only navigation */}
+      <div className="flex justify-end px-2 pb-20 sm:px-0 md:pb-4">
+        {isLastQuestion ? (
+          <Button
+            onClick={handleComplete}
+            disabled={isCompleting || isPending || !currentIsAnswered}
+            className="min-h-[48px] gap-2 px-8 text-base"
+          >
+            <CheckCircle className="h-4 w-4" />
+            Termina testul
+          </Button>
+        ) : (
+          <Button
+            onClick={goNext}
+            disabled={!currentIsAnswered}
+            className="min-h-[48px] gap-2 px-8 text-base"
+          >
+            Urmatoarea
+            <ChevronRight className="h-4 w-4" />
+          </Button>
+        )}
       </div>
 
       {/* Immediate feedback modal */}

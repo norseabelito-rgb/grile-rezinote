@@ -1,7 +1,8 @@
 "use client"
 
 import { useState } from "react"
-import { ChevronDown } from "lucide-react"
+import { motion, AnimatePresence } from "framer-motion"
+import { Plus } from "lucide-react"
 
 const faqs = [
   {
@@ -32,7 +33,7 @@ const faqs = [
   {
     question: "Pot exersa pe capitole individuale?",
     answer:
-      "Da! Pe langa simularea completa a examenului, poti exersa intrebari dintr-un singur capitol sau amestecate din mai multe capitole, fara limita de timp. Ideal pentru a-ti consolida cunostintele.",
+      "Da! Pe langa simularea completa a examenului, poti exersa intrebari dintr-un singur capitol sau amestecate din mai multe capitole, fara limita de timp.",
   },
 ]
 
@@ -40,42 +41,73 @@ export function FaqSection() {
   const [openIndex, setOpenIndex] = useState<number | null>(null)
 
   return (
-    <section className="bg-muted/30 py-20 sm:py-24">
-      <div className="mx-auto max-w-3xl px-4">
-        <div className="mb-12 text-center">
-          <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">
+    <section id="faq" className="relative py-28 sm:py-36">
+      {/* Separator line */}
+      <div className="absolute inset-x-0 top-0 mx-auto h-px max-w-4xl bg-gradient-to-r from-transparent via-white/[0.08] to-transparent" />
+
+      <div className="mx-auto max-w-3xl px-6">
+        <motion.div
+          className="mb-16 text-center"
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.5 }}
+        >
+          <h2
+            className="text-3xl font-bold tracking-tight text-white sm:text-4xl lg:text-5xl"
+            style={{ fontFamily: "var(--font-display)" }}
+          >
             Intrebari frecvente
           </h2>
-          <p className="mt-4 text-lg text-muted-foreground">
+          <p className="mt-5 text-lg text-white/40">
             Raspunsuri la cele mai comune intrebari
           </p>
-        </div>
+        </motion.div>
 
-        <div className="space-y-3">
+        <div className="space-y-2">
           {faqs.map((faq, index) => (
-            <div
+            <motion.div
               key={index}
-              className="overflow-hidden rounded-lg border border-border/50 bg-card"
+              initial={{ opacity: 0, y: 10 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.3, delay: index * 0.05 }}
             >
-              <button
-                onClick={() =>
-                  setOpenIndex(openIndex === index ? null : index)
-                }
-                className="flex w-full items-center justify-between px-6 py-4 text-left"
-              >
-                <span className="text-base font-medium">{faq.question}</span>
-                <ChevronDown
-                  className={`h-5 w-5 shrink-0 text-muted-foreground transition-transform duration-200 ${
-                    openIndex === index ? "rotate-180" : ""
-                  }`}
-                />
-              </button>
-              {openIndex === index && (
-                <div className="border-t border-border/50 px-6 pb-4 pt-3">
-                  <p className="text-muted-foreground">{faq.answer}</p>
-                </div>
-              )}
-            </div>
+              <div className="overflow-hidden rounded-xl border border-white/[0.06] bg-white/[0.02] transition-colors hover:bg-white/[0.03]">
+                <button
+                  onClick={() =>
+                    setOpenIndex(openIndex === index ? null : index)
+                  }
+                  className="flex w-full items-center justify-between px-6 py-5 text-left"
+                >
+                  <span className="pr-4 text-[15px] font-medium text-white/90">
+                    {faq.question}
+                  </span>
+                  <Plus
+                    className={`h-4 w-4 shrink-0 text-white/30 transition-transform duration-300 ${
+                      openIndex === index ? "rotate-45" : ""
+                    }`}
+                  />
+                </button>
+                <AnimatePresence initial={false}>
+                  {openIndex === index && (
+                    <motion.div
+                      initial={{ height: 0, opacity: 0 }}
+                      animate={{ height: "auto", opacity: 1 }}
+                      exit={{ height: 0, opacity: 0 }}
+                      transition={{ duration: 0.3, ease: "easeInOut" }}
+                      className="overflow-hidden"
+                    >
+                      <div className="border-t border-white/[0.04] px-6 pb-5 pt-4">
+                        <p className="text-[15px] leading-relaxed text-white/40">
+                          {faq.answer}
+                        </p>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+            </motion.div>
           ))}
         </div>
       </div>

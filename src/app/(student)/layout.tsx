@@ -5,6 +5,7 @@ import { checkSubscriptionAccess } from "@/lib/subscription/check"
 import { startTrial } from "@/lib/subscription/trial"
 import { PaywallOverlay } from "@/components/paywall/PaywallOverlay"
 import { PwaInstallPrompt } from "@/components/pwa/install-prompt"
+import { AntiCopy } from "@/components/shared/anti-copy"
 
 export const metadata: Metadata = {
   title: "Dashboard | grile-ReziNOTE",
@@ -45,6 +46,7 @@ export default async function StudentLayout({
 
   return (
     <AppShell links={studentLinks} userEmail={user?.email ?? null} showMobileTabBar>
+      <AntiCopy />
       {/* Trial banner */}
       {subscriptionAccess?.status === "trialing" &&
         subscriptionAccess.trialDaysRemaining !== undefined && (

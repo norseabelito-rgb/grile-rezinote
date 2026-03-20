@@ -5,10 +5,9 @@ import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { ExamTimer } from "./ExamTimer"
 import { ExamQuestion } from "./ExamQuestion"
-import { ExamNavigator } from "./ExamNavigator"
 import { SubmitConfirmModal } from "./SubmitConfirmModal"
 import { batchSaveAnswers, submitExam } from "@/lib/actions/exam"
-import { ChevronLeft, ChevronRight } from "lucide-react"
+import { ChevronRight, Send } from "lucide-react"
 
 interface QuestionOption {
   label: string
@@ -37,8 +36,16 @@ export function ExamContainer({
 }: ExamContainerProps) {
   const router = useRouter()
 
-  // Current question index
-  const [currentIndex, setCurrentIndex] = useState(0)
+  // Determine starting index: resume from the first unanswered question
+  const getStartIndex = () => {
+    for (let i = 0; i < questions.length; i++) {
+      const ans = initialAnswers.get(questions[i].id)
+      if (!ans || ans.selectedOptions.length === 0) return i
+    }
+    return questions.length - 1
+  }
+
+  const [currentIndex, setCurrentIndex] = useState(getStartIndex)
 
   // Answer state
   const [answers, setAnswers] = useState<Map<string, string[]>>(() => {
@@ -68,37 +75,17 @@ export function ExamContainer({
   const isAutoSubmittingRef = useRef(false)
 
   const currentQuestion = questions[currentIndex]
+  const isLastQuestion = currentIndex === questions.length - 1
+  const currentHasAnswer = currentQuestion
+    ? (answers.get(currentQuestion.id)?.length ?? 0) > 0
+    : false
 
-  // Navigation
-  const goToQuestion = useCallback(
-    (index: number) => {
-      setCurrentIndex(Math.max(0, Math.min(index, questions.length - 1)))
-    },
-    [questions.length]
-  )
-
+  // Forward-only navigation — no going back
   const goNext = useCallback(() => {
     if (currentIndex < questions.length - 1) {
       setCurrentIndex((prev) => prev + 1)
     }
   }, [currentIndex, questions.length])
-
-  const goPrev = useCallback(() => {
-    if (currentIndex > 0) {
-      setCurrentIndex((prev) => prev - 1)
-    }
-  }, [currentIndex])
-
-  // Navigate by question ID (from navigator grid)
-  const navigateToQuestion = useCallback(
-    (questionId: string) => {
-      const idx = questions.findIndex((q) => q.id === questionId)
-      if (idx >= 0) {
-        setCurrentIndex(idx)
-      }
-    },
-    [questions]
-  )
 
   // Handle answer selection
   function handleAnswer(questionId: string, selectedOptions: string[]) {
@@ -108,10 +95,8 @@ export function ExamContainer({
       return next
     })
 
-    // Track dirty for batch save
     dirtyAnswersRef.current.set(questionId, selectedOptions)
 
-    // Update answered set
     if (selectedOptions.length > 0) {
       setAnsweredIds((prev) => {
         const next = new Set(prev)
@@ -151,7 +136,6 @@ export function ExamContainer({
     try {
       const result = await batchSaveAnswers({ attemptId, answers: batch })
       if (result && "error" in result) {
-        // Restore dirty answers on error for retry
         for (const [k, v] of Object.entries(batch)) {
           dirtyAnswersRef.current.set(k, v)
         }
@@ -160,7 +144,6 @@ export function ExamContainer({
       setLastSaved(new Date())
       return true
     } catch {
-      // Restore on network error
       for (const [k, v] of Object.entries(batch)) {
         dirtyAnswersRef.current.set(k, v)
       }
@@ -181,15 +164,19 @@ export function ExamContainer({
     return () => clearInterval(interval)
   }, [flushDirtyAnswers])
 
+  // Also flush when navigating to next question
+  const handleNext = useCallback(() => {
+    flushDirtyAnswers()
+    goNext()
+  }, [flushDirtyAnswers, goNext])
+
   // Timer expired - auto submit
   const handleTimeUp = useCallback(async () => {
     if (isAutoSubmittingRef.current) return
     isAutoSubmittingRef.current = true
 
-    // Flush any remaining dirty answers
     await flushDirtyAnswers()
 
-    // Submit the exam
     try {
       await submitExam(attemptId)
     } finally {
@@ -201,10 +188,8 @@ export function ExamContainer({
   async function handleSubmitConfirm() {
     setIsSubmitting(true)
     try {
-      // Flush dirty answers first
       await flushDirtyAnswers()
 
-      // Submit exam
       const result = await submitExam(attemptId)
       if (result && "error" in result) {
         console.error("Submit error:", result.error)
@@ -220,58 +205,53 @@ export function ExamContainer({
     }
   }
 
-  // Keyboard navigation
-  useEffect(() => {
-    function handleKeyDown(e: KeyboardEvent) {
-      if (e.key === "ArrowRight" || e.key === "ArrowDown") {
-        e.preventDefault()
-        goNext()
-      } else if (e.key === "ArrowLeft" || e.key === "ArrowUp") {
-        e.preventDefault()
-        goPrev()
-      }
-    }
-
-    window.addEventListener("keydown", handleKeyDown)
-    return () => window.removeEventListener("keydown", handleKeyDown)
-  }, [goNext, goPrev])
-
   const unansweredCount = questions.length - answeredIds.size
 
   return (
-    <div className="flex gap-6">
-      {/* Main content */}
-      <div className="flex-1 space-y-4 pb-20 md:pb-4">
-        {/* Sticky top bar */}
-        <div className="sticky top-0 z-30 flex flex-wrap items-center justify-between gap-2 border-b bg-background px-2 py-2 sm:py-3">
-          <ExamTimer deadline={deadline} onTimeUp={handleTimeUp} />
+    <div className="mx-auto max-w-3xl space-y-4">
+      {/* Sticky top bar */}
+      <div className="sticky top-0 z-30 flex flex-wrap items-center justify-between gap-2 rounded-b-xl border-b bg-background/95 px-4 py-3 backdrop-blur-sm">
+        <ExamTimer deadline={deadline} onTimeUp={handleTimeUp} />
 
-          <span className="text-xs font-medium text-muted-foreground sm:text-sm">
-            {currentIndex + 1}/{questions.length}
+        <div className="flex items-center gap-3">
+          <span className="text-sm font-semibold tabular-nums text-muted-foreground">
+            {currentIndex + 1} / {questions.length}
           </span>
 
-          <div className="flex items-center gap-2">
-            {isSaving && (
-              <span className="hidden text-xs text-muted-foreground animate-pulse sm:inline">
-                Salvare...
-              </span>
-            )}
-            {!isSaving && lastSaved && (
-              <span className="hidden text-xs text-muted-foreground sm:inline">Salvat</span>
-            )}
-            <Button
-              size="sm"
-              onClick={() => setShowSubmitModal(true)}
-              disabled={isSubmitting}
-              className="min-h-[44px] text-xs sm:text-sm"
-            >
-              Trimite
-            </Button>
-          </div>
-        </div>
+          {isSaving && (
+            <span className="hidden text-xs text-muted-foreground animate-pulse sm:inline">
+              Salvare...
+            </span>
+          )}
+          {!isSaving && lastSaved && (
+            <span className="hidden text-xs text-muted-foreground sm:inline">Salvat</span>
+          )}
 
-        {/* Current question */}
-        {currentQuestion && (
+          <Button
+            size="sm"
+            onClick={() => setShowSubmitModal(true)}
+            disabled={isSubmitting}
+            className="min-h-[44px] gap-2 text-xs sm:text-sm"
+          >
+            <Send className="h-3.5 w-3.5" />
+            Trimite
+          </Button>
+        </div>
+      </div>
+
+      {/* Progress bar */}
+      <div className="mx-4">
+        <div className="h-1.5 w-full overflow-hidden rounded-full bg-muted">
+          <div
+            className="h-full rounded-full bg-primary transition-all duration-500 ease-out"
+            style={{ width: `${((currentIndex + 1) / questions.length) * 100}%` }}
+          />
+        </div>
+      </div>
+
+      {/* Current question */}
+      {currentQuestion && (
+        <div className="px-2 sm:px-0">
           <ExamQuestion
             question={currentQuestion}
             questionNumber={currentIndex + 1}
@@ -281,41 +261,30 @@ export function ExamContainer({
             onFlag={handleFlag}
             isFlagged={flaggedIds.has(currentQuestion.id)}
           />
-        )}
+        </div>
+      )}
 
-        {/* Bottom navigation */}
-        <div className="flex items-center justify-between">
+      {/* Forward-only navigation */}
+      <div className="flex justify-end px-2 pb-20 sm:px-0 md:pb-4">
+        {isLastQuestion ? (
           <Button
-            variant="outline"
-            onClick={goPrev}
-            disabled={currentIndex === 0}
-            className="min-h-[44px] gap-2"
+            onClick={() => setShowSubmitModal(true)}
+            disabled={isSubmitting}
+            className="min-h-[48px] gap-2 px-8 text-base"
           >
-            <ChevronLeft className="h-4 w-4" />
-            Anterioara
+            <Send className="h-4 w-4" />
+            Trimite examenul
           </Button>
-
+        ) : (
           <Button
-            variant="outline"
-            onClick={goNext}
-            disabled={currentIndex === questions.length - 1}
-            className="min-h-[44px] gap-2"
+            onClick={handleNext}
+            disabled={!currentHasAnswer}
+            className="min-h-[48px] gap-2 px-8 text-base"
           >
             Urmatoarea
             <ChevronRight className="h-4 w-4" />
           </Button>
-        </div>
-      </div>
-
-      {/* Navigator - desktop shows sidebar, mobile shows bottom bar + sheet */}
-      <div className="w-0 shrink-0 md:w-48">
-        <ExamNavigator
-          questions={questions.map((q, i) => ({ id: q.id, number: i + 1 }))}
-          answeredIds={answeredIds}
-          flaggedIds={flaggedIds}
-          currentQuestionId={currentQuestion?.id ?? ""}
-          onNavigate={navigateToQuestion}
-        />
+        )}
       </div>
 
       {/* Submit confirmation modal */}

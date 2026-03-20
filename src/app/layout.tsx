@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next"
-import { Inter } from "next/font/google"
+import { Inter, Sora } from "next/font/google"
 import { ThemeProvider } from "next-themes"
 import { OfflineIndicator } from "@/components/pwa/offline-indicator"
 import "./globals.css"
@@ -8,6 +8,13 @@ const inter = Inter({
   subsets: ["latin", "latin-ext"],
   display: "swap",
   variable: "--font-inter",
+})
+
+const sora = Sora({
+  subsets: ["latin", "latin-ext"],
+  display: "swap",
+  variable: "--font-sora",
+  weight: ["400", "500", "600", "700", "800"],
 })
 
 export const metadata: Metadata = {
@@ -36,7 +43,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ro" suppressHydrationWarning>
-      <body className={`${inter.variable} font-sans antialiased`}>
+      <body className={`${inter.variable} ${sora.variable} font-sans antialiased`}>
         <OfflineIndicator />
         <ThemeProvider
           attribute="class"

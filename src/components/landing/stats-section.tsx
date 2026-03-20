@@ -1,72 +1,96 @@
 "use client"
 
-import { FadeIn } from "@/components/motion/fade-in"
+import { motion } from "framer-motion"
 import { AnimatedCounter } from "@/components/motion/animated-counter"
-import { StaggerChildren, StaggerItem } from "@/components/motion/stagger-children"
 
 const stats = [
   {
     value: 200,
     suffix: "",
     label: "intrebari per simulare",
-    description: "Identic cu examenul real",
+    detail: "Identic cu examenul real",
   },
   {
     value: 950,
     suffix: "",
     label: "punctaj maxim posibil",
-    description: "50 CS x 4 + 150 CM x 5",
+    detail: "50 CS + 150 CM",
   },
   {
     value: 5,
     suffix: "+",
     label: "ani de date istorice",
-    description: "Praguri reale de admitere",
+    detail: "Praguri reale de admitere",
   },
   {
     value: 100,
     suffix: "%",
     label: "formula oficiala",
-    description: "Scoring romanesc autentic",
+    detail: "Scoring romanesc autentic",
   },
 ]
 
 export function StatsSection() {
   return (
-    <section className="relative py-20 sm:py-28">
-      <div className="absolute inset-0 -z-10 gradient-surface" />
-      <div className="mx-auto max-w-5xl px-4">
-        <FadeIn className="mb-16 text-center">
-          <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">
-            Pregatire bazata pe date reale
+    <section className="relative py-28 sm:py-36">
+      {/* Separator line */}
+      <div className="absolute inset-x-0 top-0 mx-auto h-px max-w-4xl bg-gradient-to-r from-transparent via-white/[0.08] to-transparent" />
+
+      {/* Subtle glow */}
+      <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
+        <div className="h-[300px] w-[600px] rounded-full bg-teal-500/[0.03] blur-[120px]" />
+      </div>
+
+      <div className="relative mx-auto max-w-5xl px-6">
+        <motion.div
+          className="mb-20 text-center"
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.5 }}
+        >
+          <h2
+            className="text-3xl font-bold tracking-tight text-white sm:text-4xl lg:text-5xl"
+            style={{ fontFamily: "var(--font-display)" }}
+          >
+            Pregatire bazata pe{" "}
+            <span className="bg-gradient-to-r from-emerald-400 to-teal-300 bg-clip-text text-transparent">
+              date reale
+            </span>
           </h2>
-          <p className="mt-4 text-lg text-muted-foreground">
+          <p className="mt-5 text-lg text-white/40">
             Folosim date autentice din examenele de rezidentiat din Romania
           </p>
-        </FadeIn>
+        </motion.div>
 
-        <StaggerChildren
-          className="grid grid-cols-2 gap-8 lg:grid-cols-4"
-          staggerDelay={0.12}
-        >
-          {stats.map((stat) => (
-            <StaggerItem key={stat.label} className="text-center">
-              <div className="text-4xl font-extrabold tracking-tight sm:text-5xl">
-                <AnimatedCounter
-                  value={stat.value}
-                  className="gradient-text-animated"
-                />
-                <span className="gradient-text-animated">{stat.suffix}</span>
+        <div className="grid grid-cols-2 gap-6 lg:grid-cols-4">
+          {stats.map((stat, i) => (
+            <motion.div
+              key={stat.label}
+              className="rounded-2xl border border-white/[0.06] bg-white/[0.02] p-6 text-center"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.4, delay: i * 0.1 }}
+            >
+              <div
+                className="text-4xl font-extrabold tracking-tight sm:text-5xl"
+                style={{ fontFamily: "var(--font-display)" }}
+              >
+                <span className="bg-gradient-to-b from-white to-white/60 bg-clip-text text-transparent">
+                  <AnimatedCounter value={stat.value} />
+                  {stat.suffix}
+                </span>
               </div>
-              <div className="mt-2 text-sm font-bold uppercase tracking-wider text-foreground">
+              <div className="mt-2 text-xs font-bold uppercase tracking-[0.15em] text-white/60">
                 {stat.label}
               </div>
-              <div className="mt-1 text-sm text-muted-foreground">
-                {stat.description}
+              <div className="mt-1 text-xs text-white/30">
+                {stat.detail}
               </div>
-            </StaggerItem>
+            </motion.div>
           ))}
-        </StaggerChildren>
+        </div>
       </div>
     </section>
   )
